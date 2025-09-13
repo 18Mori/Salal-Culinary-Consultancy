@@ -10,7 +10,6 @@ const LoginForm = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberme: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -20,14 +19,14 @@ const LoginForm = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData?.email) {
+    if (!formData.email) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData?.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
-    if (!formData?.password) {
+    if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData?.password?.length < 6) {
+    } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
@@ -44,7 +43,7 @@ const LoginForm = () => {
     setErrors({});
 
     try {
-      const response = await api.post('/api/auth/login/', {
+      const response = await fetch('/api/auth/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,11 +57,10 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save JWT tokens and user info
-        localStorage.setItem('accessToken', data.access);
-        localStorage.setItem('refreshToken', data.refresh);
-        localStorage.setItem('userType', data.user.user_type);
-        localStorage.setItem('isAuthenticated', 'true');
+        // Save JWT tokens and user info as per your backend response
+        localStorage.setItem(ACCESS_TOKEN, data.access);
+        localStorage.setItem(REFRESH_TOKEN, data.refresh);
+        localStorage.setItem('userType', data.user.user_type); // Matches your LoginView response
 
         if (data.user.user_type === 'admin') {
           navigate('/admin_dashboard');
@@ -70,7 +68,6 @@ const LoginForm = () => {
           navigate('/client_dashboard');
         }
       } else {
-        // Handle auth errors from Django
         if (data.non_field_errors) {
           setErrors({ general: data.non_field_errors[0] });
         } else if (data.email) {
@@ -92,6 +89,63 @@ const LoginForm = () => {
   const handleForgotPassword = () => {
     navigate('/forgot_password');
   };
+
+  return (
+    <div className="form-container">
+      <h2>Login</h2>
+
+      {errors.general && <div className="error-message">{errors.general}</div>}
+
+      <form onSubmit={handleSubmit} className="login-form">
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            placeholder="your@email.com"
+            className={errors.email ? 'error' : ''}
+          />
+          {errors.email && <span className="error-text">{errors.email}</span>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <div className="password-input-wrapper">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              placeholder="••••••••"
+              className={errors.password ? 'error' : ''}
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
+          {errors.password && <span className="error-text">{errors.password}</span>}
+        </div>
+
+        <button type="submit" disabled={isLoading} className="btn-primary">
+          {isLoading ? <LoadingIndicator /> : 'Login'}
+        </button>
+      </form>
+
+      <p className="forgot-password">
+        <button type="button" onClick={handleForgotPassword} className="link-btn">
+          Forgot Password?
+        </button>
+      </p>
+    </div>
+  );
 };
 
 export default LoginForm;
