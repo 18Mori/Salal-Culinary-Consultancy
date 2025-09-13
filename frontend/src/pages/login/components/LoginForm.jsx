@@ -64,5 +64,33 @@ const LoginForm = () => {
         localStorage.setItem('refreshToken', data.refresh);
         localStorage.setItem('userType', data.user.user_type);
         localStorage.setItem('isAuthenticated', 'true');
-  }
+
+        if (data.user.user_type === 'admin') {
+          navigate('/admin_dashboard');
+        } else {
+          navigate('/client_dashboard');
+        }
+      } else {
+        // Handle auth errors from Django
+        if (data.non_field_errors) {
+          setErrors({ general: data.non_field_errors[0] });
+        } else if (data.email) {
+          setErrors({ email: data.email[0] });
+        } else if (data.password) {
+          setErrors({ password: data.password[0] });
+        } else {
+          setErrors({ general: 'Login failed. Please try again.' });
+        }
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      setErrors({ general: 'Network error. Please check your connection.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = () => {
+    navigate('/forgot_password');
+  };
 }
