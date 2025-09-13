@@ -2,23 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from "../api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import "../styles/Form.css"
+import "../styles/Form.css";
 import LoadingIndicator from "./LoadingIndicator";
-
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberme: '',
+    rememberme: false,
   });
 
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  validteForm = () => {
+  const validateForm = () => {
     const newErrors = {};
 
     if (!formData?.email) {
@@ -39,13 +38,13 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validteForm()) return;
+    if (!validateForm()) return;
 
     setIsLoading(true);
     setErrors({});
 
     try {
-      const response = await fetch('/api/auth/login/', {
+      const response = await api.post('/api/auth/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
