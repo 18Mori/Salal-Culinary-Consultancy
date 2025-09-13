@@ -93,4 +93,6 @@ const LoginForm = () => {
   const handleForgotPassword = () => {
     navigate('/forgot_password');
   };
-}
+};
+
+export default LoginForm;
