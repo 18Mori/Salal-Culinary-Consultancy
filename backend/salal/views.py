@@ -38,3 +38,26 @@ class LoginView(APIView):
                 'status': user.status,
             }
         }, status=status.HTTP_200_OK)
+        
+        
+class RegisterView(APIView):
+    permission_classes = []
+    
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'user_type': user.user_type,
+                    'status': user.status,
+                }
+            }, status=status.HTTP_201_CREATED)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

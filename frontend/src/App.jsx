@@ -1,7 +1,7 @@
 import react from "react"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
+import Login from "./pages/login/components/Login"
+import Register from "./pages/register/components/Register"
 import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -28,9 +28,9 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Form route="/api/auth/login/" method="login" />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/register" element={<RegisterAndLogout />} />
+        <Route path="/register" element={<Form route="/api/auth/register/" method="register" />} />
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </BrowserRouter>
