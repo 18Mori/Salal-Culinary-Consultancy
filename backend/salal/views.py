@@ -27,7 +27,14 @@ class LoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
             
+        if not user.is_active:
+            return Response(
+                {'non_field_errors': ['This account is inactive.']}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+            
         refresh = RefreshToken.for_user(user)
+        
         return Response({
             'access': str(refresh.access_token),
             'refresh': str(refresh),
