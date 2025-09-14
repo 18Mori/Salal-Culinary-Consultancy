@@ -7,6 +7,7 @@ import LoadingIndicator from "./LoadingIndicator";
 
 function Form({ route, method }) {
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState(""); 
@@ -21,6 +22,14 @@ function Form({ route, method }) {
     e.preventDefault();
     setLoading(true);
     setErrors({});
+
+     // Validate required fields
+    if (!username || !password) {
+      if (!username) setErrors((prev) => ({ ...prev, username: "Username is required" }));
+      if (!password) setErrors((prev) => ({ ...prev, password: "Password is required" }));
+      setLoading(false);
+      return;
+    }
 
     // Validation for registration
     if (method === "register") {
@@ -52,6 +61,7 @@ function Form({ route, method }) {
         payload = { email, password };
       } else {
         payload = {
+          username,
           email,
           first_name: firstName,
           last_name: lastName,
@@ -60,7 +70,13 @@ function Form({ route, method }) {
         };
       }
 
-      const res = await api.post(route, payload);
+      const res = await fetch(route,
+        {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+      );
 
       if (method === "login") {
         // Save token
@@ -98,16 +114,16 @@ function Form({ route, method }) {
       {errors.general && <div className="error-message">{errors.general}</div>}
 
       <div className="form-group">
-        <input
-          className={`form-input ${errors.email ? "error" : ""}`}
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          autoComplete="email"
-        />
-        {errors.email && <span className="error-text">{errors.email}</span>}
-      </div>
+            <input
+              className={`form-input ${errors.username ? "error" : ""}`}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              autoComplete="username"
+            />
+            {errors.username && <span className="error-text">{errors.username}</span>}
+          </div>
 
       <div className="form-group">
         <input
