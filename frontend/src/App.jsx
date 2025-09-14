@@ -28,9 +28,9 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/login" element={<Form route="/api/auth/login/" method="login" />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/register" element={<Form route="/api/auth/register/" method="register" />} />
+        <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </BrowserRouter>
