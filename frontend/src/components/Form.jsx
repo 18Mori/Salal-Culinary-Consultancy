@@ -10,8 +10,7 @@ function Form({ route, method }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState(""); 
-  const [lastName, setLastName] = useState("");
+  const [fullName, setFullName] = useState(""); 
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -58,51 +57,50 @@ function Form({ route, method }) {
       let payload;
 
       if (method === "login") {
-        payload = { email, password };
+        payload = { username, password };
       } else {
         payload = {
           username,
           email,
-          first_name: firstName,
-          last_name: lastName,
+          full_name: fullName,
           password,
           password_confirm: passwordConfirm,
         };
       }
 
-      const res = await fetch(route,
-        {
+      const apiUrl = import.meta.env.VITE_API_URL;
+
+      const res = await fetch(`${apiUrl}/api/auth/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      }
-      );
+      });
 
-      if (method === "login") {
+      const data = await res.json();
+
+      if (res.ok) {
         // Save token
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         localStorage.setItem("userType", res.data.user.user_type);
 
-
-        if (res.data.user.user_type === "admin") {
+        if (data.user.user_type === 'admin') {
           navigate("/admin_dashboard");
         } else {
           navigate("/client_dashboard");
         }
       } else {
-
-        navigate("/login");
+        if (data.username) setErrors((prev) => ({ ...prev, username: data.username[0] }));
+        if (data.email) setErrors((prev) => ({ ...prev, email: data.email[0] }));
+        if (data.password) setErrors((prev) => ({ ...prev, password: data.password[0] }));
+        if (data.password_confirm) setErrors((prev) => ({ ...prev, passwordConfirm: data.password_confirm[0] }));
+        if (data.non_field_errors) setErrors((prev) => ({ ...prev, general: data.non_field_errors[0] }));
+        else setErrors((prev) => ({ ...prev, general: "Registration/Login failed. Please try again." }));
       }
+
     } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-
-      if (error.response?.data) {
-        const serverErrors = error.response.data;
-        setErrors(serverErrors);
-      } else {
-        setErrors({ general: "Network error. Please check your connection." });
-      }
+      console.error("Network error:", error);
+      setErrors({ general: "Network error. Please check your connection." });
     } finally {
       setLoading(false);
     }
@@ -141,24 +139,25 @@ function Form({ route, method }) {
         <>
           <div className="form-group">
             <input
-              className={`form-input ${errors.first_name ? "error" : ""}`}
+              className={`form-input ${errors.full_name ? "error" : ""}`}
               type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              placeholder="First Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Full Name"
             />
-            {errors.first_name && <span className="error-text">{errors.first_name}</span>}
+            {errors.full_name && <span className="error-text">{errors.full_name}</span>}
           </div>
 
           <div className="form-group">
             <input
-              className={`form-input ${errors.last_name ? "error" : ""}`}
+              className={`form-input ${errors.username ? "error" : ""}`}
               type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              placeholder="Last Name"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="...@gmail.com"
+              autoComplete="email"
             />
-            {errors.last_name && <span className="error-text">{errors.last_name}</span>}
+            {errors.username && <span className="error-text">{errors.email}</span>}
           </div>
 
           <div className="form-group">

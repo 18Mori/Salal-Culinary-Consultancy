@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
 from .models import User
 
 class LoginView(APIView):
@@ -49,7 +50,7 @@ class LoginView(APIView):
         
         
 class RegisterView(APIView):
-    permission_classes = []
+    permission_classes = [AllowAny]
     
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -62,7 +63,9 @@ class RegisterView(APIView):
                 'refresh': str(refresh),
                 'user': {
                     'id': user.id,
+                    'fullname': user.full_name,
                     'email': user.email,
+                    'username': user.username,
                     'user_type': user.user_type,
                     'status': user.status,
                 }
