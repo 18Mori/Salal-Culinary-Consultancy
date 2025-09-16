@@ -9,13 +9,14 @@ User = get_user_model()
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150, min_length=3)
     first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'password', 'password_confirm']
+        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm']
         
     def validate(self, attrs):
       if attrs['password'] != attrs.pop('password_confirm'):

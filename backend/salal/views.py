@@ -43,6 +43,7 @@ class LoginView(APIView):
             'user': {
                 'id': user.id,
                 'username': user.username,
+                'password': user.password,
             }
         }, status=status.HTTP_200_OK)
         
@@ -65,6 +66,7 @@ class RegisterView(APIView):
                     'lastname': user.last_name,
                     'email': user.email,
                     'username': user.username,
+                    'password': user.password,
                 }
             }, status=status.HTTP_201_CREATED)
             
