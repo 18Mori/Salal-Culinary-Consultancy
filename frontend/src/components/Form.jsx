@@ -13,6 +13,12 @@ function Form({ route, method }) {
   const [firstName, setFirstName] = useState(""); 
   const [lastName, setLastName] = useState(""); 
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [passFeedback, setPassFeedback] = useState({
+    length: false,
+    letter: false,
+    number: false,
+    symbol: false,
+  });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -24,26 +30,20 @@ function Form({ route, method }) {
     setErrors({});
 
      // Validate required fields
-    if (!username || !password || !email || !firstName || !lastName) {
+    if (!username || !password || (method === "register" && !email && !firstName && !lastName && !passwordConfirm)) {
       if (!username) setErrors((prev) => ({ ...prev, username: "Username is required" }));
       if (!email) setErrors((prev) => ({ ...prev, email: "Email is required" }));
       if (!password) setErrors((prev) => ({ ...prev, password: "Password is required" }));
-      if (!firstName) setErrors((prev) => ({ ...prev, first_name: "First name is required" }));
-      if (!lastName) setErrors((prev) => ({ ...prev, last_name: "Last name is required" }));
-      setLoading(false);
-      return;
-    }
-
-    // Validation for registration
-    if (method === "register") {
-      if (!email || !password || !passwordConfirm) {
-        if (!passwordConfirm) setErrors((prev) => ({ ...prev, passwordConfirm: "Confirm password is required" }));
-        setLoading(false);
-        return;
-      }
-
+      if (!passwordConfirm) setErrors((prev) => ({ ...prev, passwordConfirm: "Confirm password is required" }));
       if (password !== passwordConfirm) {
         setErrors((prev) => ({ ...prev, passwordConfirm: "Passwords do not match" }));
+      }
+      if (!firstName) setErrors((prev) => ({ ...prev, firstName: "First name is required" }));
+      if (!lastName) setErrors((prev) => ({ ...prev, lastName: "Last name is required" }));
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setErrors((prev) => ({ ...prev, email: "Invalid email format" }));
         setLoading(false);
         return;
       }
@@ -53,7 +53,7 @@ function Form({ route, method }) {
   letter: /[A-Za-z]/.test(password),
   number: /\d/.test(password),
   symbol: /[!@#$%]/.test(password),
-};
+  };
 
       const passwordErrors = {};
 
@@ -73,33 +73,14 @@ function Form({ route, method }) {
   passwordErrors.password = "Password must contain at least one symbol: !@#$%";
 }
 
-      if (object.keys(passwordErrors).length > 0) {
+      if (Object.keys(passwordErrors).length > 0) {
         setErrors((prev) => ({ ...prev, ...passwordErrors }));
   setLoading(false);
   return;
       }
 
-      const confirmPassword = passwordConfirm;
-      if (password !== confirmPassword) {
-        setErrors((prev) => ({ ...prev, passwordConfirm: "Passwords do not match" }));
-        setLoading(false);
-        return;
-      }
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        setErrors((prev) => ({ ...prev, email: "Invalid email format" }));
-        setLoading(false);
-        return;
-      }
-
-      if (!firstName) setErrors((prev) => ({ ...prev, first_name: "First name is required" }));
-      if (!lastName) setErrors((prev) => ({ ...prev, last_name: "Last name is required" }));
-
-      if (!firstName || !lastName) {
-        setLoading(false);
-        return;
-      }
+      setLoading(false);
+      return;
     }
 
     try {
@@ -116,10 +97,10 @@ function Form({ route, method }) {
         payload = {
           username,
           email,
-          first_name: firstName,
-          last_name: lastName, 
+          firstName,
+          lastName,
           password,
-          password_confirm: passwordConfirm,
+          passwordConfirm,
         };
       }
 
@@ -136,8 +117,6 @@ function Form({ route, method }) {
       console.log("Response data:", data);
       // console.log("Response ok:", res.ok);
 
-      if (method === "login") {
-
         if (res.ok) {
         // Save token
         localStorage.setItem(ACCESS_TOKEN, data.access);
@@ -145,11 +124,11 @@ function Form({ route, method }) {
 
         } else {
         if (data.username) setErrors((prev) => ({ ...prev, username: data.username[0] }));
-        if (data.first_name) setErrors((prev) => ({ ...prev, first_name: data.first_name[0] }));
-        if (data.last_name) setErrors((prev) => ({ ...prev, last_name: data.last_name[0] }));
+        if (data.firstName) setErrors((prev) => ({ ...prev, firstName: data.firstName[0] }));
+        if (data.lastName) setErrors((prev) => ({ ...prev, lastName: data.lastName[0] }));
         if (data.email) setErrors((prev) => ({ ...prev, email: data.email[0] }));
         if (data.password) setErrors((prev) => ({ ...prev, password: data.password[0] }));
-        if (data.password_confirm) setErrors((prev) => ({ ...prev, passwordConfirm: data.password_confirm[0] }));
+        if (data.passwordConfirm) setErrors((prev) => ({ ...prev, passwordConfirm: data.passwordConfirm[0] }));
         if (data.non_field_errors) setErrors((prev) => ({ ...prev, general: data.non_field_errors[0] }));
         else setErrors((prev) => ({ ...prev, general: "Registration/Login failed. Please try again." }));
       }
@@ -164,11 +143,10 @@ function Form({ route, method }) {
           setLoading(false);
           return;
         }
-      }
-
-      } else {
+      }else {
         // navigate('/login')
       }
+
 
         // if (data.user.user_type === 'admin') {
         //   navigate("/admin_dashboard");
@@ -183,6 +161,19 @@ function Form({ route, method }) {
       setLoading(false);
     }
   };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+
+    setPassFeedback({
+      length: newPassword.length >= 8,
+      letter: /[A-Za-z]/.test(newPassword),
+      number: /\d/.test(newPassword),
+      symbol: /[!@#$%]/.test(newPassword),
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit} className="form-container">
       <h1>{name}</h1>
@@ -212,6 +203,9 @@ function Form({ route, method }) {
           placeholder="Password"
           autoComplete="new-password"
         />
+
+          
+
         {errors.password && <span className="error-text">{errors.password}</span>}
       </div>
         </>
@@ -221,24 +215,24 @@ function Form({ route, method }) {
         <>
           <div className="form-group">
             <input
-              className={`form-input ${errors.first_name ? "error" : ""}`}
+              className={`form-input ${errors.firstName ? "error" : ""}`}
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="First Name"
             />
-            {errors.first_name && <span className="error-text">{errors.first_name}</span>}
+            {errors.firstName && <span className="error-text">{errors.firstName}</span>}
           </div>
 
           <div className="form-group">
             <input
-              className={`form-input ${errors.first_name ? "error" : ""}`}
+              className={`form-input ${errors.firstName ? "error" : ""}`}
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Last Name"
             />
-            {errors.last_name && <span className="error-text">{errors.last_name}</span>}
+            {errors.lastName && <span className="error-text">{errors.lastName}</span>}
           </div>
 
           <div className="form-group">
@@ -250,7 +244,7 @@ function Form({ route, method }) {
               placeholder="...@gmail.com"
               autoComplete="email"
             />
-            {errors.username && <span className="error-text">{errors.email}</span>}
+            {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
 
           <div className="form-group">
@@ -270,23 +264,40 @@ function Form({ route, method }) {
           className={`form-input ${errors.password ? "error" : ""}`}
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handlePasswordChange}
           placeholder="Password"
           autoComplete="new-password"
         />
+        {password && (
+              <div style={{ fontSize: '0.8rem', marginTop: '4px', color: '#666' }}>
+                <span style={{ color: passFeedback.length ? 'green' : 'red' }}>
+                  ✓ At least 8 characters
+                </span><br />
+                <span style={{ color: passFeedback.letter ? 'green' : 'red' }}>
+                  ✓ At least one letter
+                </span><br />
+                <span style={{ color: passFeedback.number ? 'green' : 'red' }}>
+                  ✓ At least one number
+                </span><br />
+                <span style={{ color: passFeedback.symbol ? 'green' : 'red' }}>
+                  ✓ At least one symbol: !@#$%
+                </span>
+              </div>
+            )}
+
         {errors.password && <span className="error-text">{errors.password}</span>}
       </div>
 
           <div className="form-group">
             <input
-              className={`form-input ${errors.password_confirm ? "error" : ""}`}
+              className={`form-input ${errors.passwordConfirm ? "error" : ""}`}
               type="password"
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
               placeholder="Confirm Password"
               autoComplete="new-password"
             />
-            {errors.password_confirm && <span className="error-text">{errors.password_confirm}</span>}
+            {errors.passwordConfirm && <span className="error-text">{errors.passwordConfirm}</span>}
           </div>
         </>
       )}

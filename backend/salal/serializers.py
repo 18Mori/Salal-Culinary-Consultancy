@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import *
 from django.contrib.auth import get_user_model
+import re
 
 User = get_user_model()
 
@@ -24,6 +25,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         raise serializers.ValidationError({'email': "This email is already registered."})
       
       return attrs
+    
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters")
+        if not re.search(r'[A-Za-z]', value):
+            raise serializers.ValidationError("Password must contain at least one letter")
+        if not re.search(r'\d', value):
+            raise serializers.ValidationError("Password must contain at least one number")
+        if not re.search(r'[!@#$%]', value):
+            raise serializers.ValidationError("Password must contain at least one symbol: !@#$%")
+        return value
     
     def create(self, validated_data):
         user = User.objects.create_user(
