@@ -3,17 +3,13 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Login from "./pages/login/components/Login"
 import Register from "./pages/register/components/Register"
 import Home from "./pages/Home"
+import ClientDashboard from "./pages/ClientDashboard/components/client_index"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 
 function Logout() {
   localStorage.clear()
-  return <Navigate to="/login" />
-}
-
-function RegisterAndLogout() {
-  localStorage.clear()
-  return <Register />
+  return <Navigate to="/login" replace={true} />
 }
 
 function App() {
@@ -21,32 +17,25 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        {/* <Route
-          path="/admin_dashboard"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/client_dashboard"
+          path="/client_index"
           element={
             <ProtectedRoute>
               <ClientDashboard />
             </ProtectedRoute>
           }
+        />
+        <Route path="/" element={<Home />} />
+        {/* <Route
+          path="/admin_index"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
         /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/register" element={<RegisterAndLogout />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </BrowserRouter>
