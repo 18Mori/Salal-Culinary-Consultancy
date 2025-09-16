@@ -10,7 +10,8 @@ function Form({ route, method }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState(""); 
+  const [firstName, setFirstName] = useState(""); 
+  const [lastName, setLastName] = useState(""); 
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -23,8 +24,9 @@ function Form({ route, method }) {
     setErrors({});
 
      // Validate required fields
-    if (!username || !password) {
+    if (!username || !password || !email) {
       if (!username) setErrors((prev) => ({ ...prev, username: "Username is required" }));
+      if (!email) setErrors((prev) => ({ ...prev, email: "Email is required" }));
       if (!password) setErrors((prev) => ({ ...prev, password: "Password is required" }));
       setLoading(false);
       return;
@@ -58,11 +60,12 @@ function Form({ route, method }) {
 
       if (method === "login") {
         payload = { username, password };
-      } else {
+      } else if (method === "register") {
         payload = {
           username,
           email,
-          full_name: fullName,
+          first_name: firstName,
+          last_name: lastName, 
           password,
           password_confirm: passwordConfirm,
         };
@@ -76,21 +79,41 @@ function Form({ route, method }) {
         body: JSON.stringify(payload),
       });
 
+
       const data = await res.json();
+
+      console.log("Response data:", data);
+
+      if (method === "login") {
+
+        if (!data.access || !data.refresh) {
+          setErrors({ general: "Login failed. Please try again." });
+          setLoading(false);
+          return;
+        }
+      } else if (method === "register") {
+        if (!data.user || !data.access || !data.refresh) {
+          setErrors({ general: "Registration failed. Please try again." });
+          setLoading(false);
+          return;
+        }
+      }
 
       if (res.ok) {
         // Save token
-        localStorage.setItem(ACCESS_TOKEN, res.data.access);
-        localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-        localStorage.setItem("userType", res.data.user.user_type);
+        localStorage.setItem(ACCESS_TOKEN, data.access);
+        localStorage.setItem(REFRESH_TOKEN, data.refresh);
+        localStorage.setItem("userType", data.user.user_type);
 
-        if (data.user.user_type === 'admin') {
-          navigate("/admin_dashboard");
-        } else {
-          navigate("/client_dashboard");
-        }
+        // if (data.user.user_type === 'admin') {
+        //   navigate("/admin_dashboard");
+        // } else {
+        //   navigate("/client_dashboard");
+        // }
       } else {
         if (data.username) setErrors((prev) => ({ ...prev, username: data.username[0] }));
+        if (data.first_name) setErrors((prev) => ({ ...prev, first_name: data.first_name[0] }));
+        if (data.last_name) setErrors((prev) => ({ ...prev, last_name: data.last_name[0] }));
         if (data.email) setErrors((prev) => ({ ...prev, email: data.email[0] }));
         if (data.password) setErrors((prev) => ({ ...prev, password: data.password[0] }));
         if (data.password_confirm) setErrors((prev) => ({ ...prev, passwordConfirm: data.password_confirm[0] }));
@@ -111,7 +134,9 @@ function Form({ route, method }) {
 
       {errors.general && <div className="error-message">{errors.general}</div>}
 
-      <div className="form-group">
+    {method === "login" && (
+        <>
+        <div className="form-group">
             <input
               className={`form-input ${errors.username ? "error" : ""}`}
               type="text"
@@ -134,18 +159,31 @@ function Form({ route, method }) {
         />
         {errors.password && <span className="error-text">{errors.password}</span>}
       </div>
+        </>
+      )}
 
-{method === "register" && (
+        {method === "register" && (
         <>
           <div className="form-group">
             <input
-              className={`form-input ${errors.full_name ? "error" : ""}`}
+              className={`form-input ${errors.first_name ? "error" : ""}`}
               type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Full Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="First Name"
             />
-            {errors.full_name && <span className="error-text">{errors.full_name}</span>}
+            {errors.first_name && <span className="error-text">{errors.first_name}</span>}
+          </div>
+
+          <div className="form-group">
+            <input
+              className={`form-input ${errors.first_name ? "error" : ""}`}
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Last Name"
+            />
+            {errors.last_name && <span className="error-text">{errors.last_name}</span>}
           </div>
 
           <div className="form-group">
@@ -159,6 +197,30 @@ function Form({ route, method }) {
             />
             {errors.username && <span className="error-text">{errors.email}</span>}
           </div>
+
+          <div className="form-group">
+            <input
+              className={`form-input ${errors.username ? "error" : ""}`}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              autoComplete="username"
+            />
+            {errors.username && <span className="error-text">{errors.username}</span>}
+          </div>
+
+      <div className="form-group">
+        <input
+          className={`form-input ${errors.password ? "error" : ""}`}
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          autoComplete="new-password"
+        />
+        {errors.password && <span className="error-text">{errors.password}</span>}
+      </div>
 
           <div className="form-group">
             <input
