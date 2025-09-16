@@ -83,34 +83,17 @@ function Form({ route, method }) {
       const data = await res.json();
 
       console.log("Response data:", data);
+      // console.log("Response ok:", res.ok);
 
       if (method === "login") {
 
-        if (!data.access || !data.refresh) {
-          setErrors({ general: "Login failed. Please try again." });
-          setLoading(false);
-          return;
-        }
-      } else if (method === "register") {
-        if (!data.user || !data.access || !data.refresh) {
-          setErrors({ general: "Registration failed. Please try again." });
-          setLoading(false);
-          return;
-        }
-      }
-
-      if (res.ok) {
+        if (res.ok) {
         // Save token
         localStorage.setItem(ACCESS_TOKEN, data.access);
         localStorage.setItem(REFRESH_TOKEN, data.refresh);
-        localStorage.setItem("userType", data.user.user_type);
+        // localStorage.setItem("userType", data.user.user_type);
 
-        // if (data.user.user_type === 'admin') {
-        //   navigate("/admin_dashboard");
-        // } else {
-        //   navigate("/client_dashboard");
-        // }
-      } else {
+        } else {
         if (data.username) setErrors((prev) => ({ ...prev, username: data.username[0] }));
         if (data.first_name) setErrors((prev) => ({ ...prev, first_name: data.first_name[0] }));
         if (data.last_name) setErrors((prev) => ({ ...prev, last_name: data.last_name[0] }));
@@ -120,6 +103,28 @@ function Form({ route, method }) {
         if (data.non_field_errors) setErrors((prev) => ({ ...prev, general: data.non_field_errors[0] }));
         else setErrors((prev) => ({ ...prev, general: "Registration/Login failed. Please try again." }));
       }
+
+        if (!data.access || !data.refresh) {
+          setErrors({ general: "Login failed. Please try again." });
+          setLoading(false);
+          return;
+        } else if (method === "register") {
+        if (!data.user || !data.access || !data.refresh) {
+          setErrors({ general: "Registration failed. Please try again." });
+          setLoading(false);
+          return;
+        }
+      }
+
+      } else {
+        // navigate('/login')
+      }
+
+        // if (data.user.user_type === 'admin') {
+        //   navigate("/admin_dashboard");
+        // } else {
+        //   navigate("/client_dashboard");
+        // }
 
     } catch (error) {
       console.error("Network error:", error);

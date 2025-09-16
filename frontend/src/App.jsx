@@ -28,6 +28,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* <Route
+          path="/admin_dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/client_dashboard"
+          element={
+            <ProtectedRoute>
+              <ClientDashboard />
+            </ProtectedRoute>
+          }
+        /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterAndLogout />} />
