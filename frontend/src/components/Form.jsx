@@ -24,10 +24,12 @@ function Form({ route, method }) {
     setErrors({});
 
      // Validate required fields
-    if (!username || !password || !email) {
+    if (!username || !password || !email || !firstName || !lastName) {
       if (!username) setErrors((prev) => ({ ...prev, username: "Username is required" }));
       if (!email) setErrors((prev) => ({ ...prev, email: "Email is required" }));
       if (!password) setErrors((prev) => ({ ...prev, password: "Password is required" }));
+      if (!firstName) setErrors((prev) => ({ ...prev, first_name: "First name is required" }));
+      if (!lastName) setErrors((prev) => ({ ...prev, last_name: "Last name is required" }));
       setLoading(false);
       return;
     }
@@ -35,8 +37,6 @@ function Form({ route, method }) {
     // Validation for registration
     if (method === "register") {
       if (!email || !password || !passwordConfirm) {
-        if (!email) setErrors((prev) => ({ ...prev, email: "Email is required" }));
-        if (!password) setErrors((prev) => ({ ...prev, password: "Password is required" }));
         if (!passwordConfirm) setErrors((prev) => ({ ...prev, passwordConfirm: "Confirm password is required" }));
         setLoading(false);
         return;
@@ -48,8 +48,55 @@ function Form({ route, method }) {
         return;
       }
 
-      if (password.length < 8) {
-        setErrors((prev) => ({ ...prev, password: "Password must be at least 8 characters" }));
+      const passwordRequirements = {
+  length: password.length >= 8,
+  letter: /[A-Za-z]/.test(password),
+  number: /\d/.test(password),
+  symbol: /[!@#$%]/.test(password),
+};
+
+      const passwordErrors = {};
+
+      if (!passwordRequirements.length) {
+  passwordErrors.password = "Password must be at least 8 characters";
+}
+
+      if (!passwordRequirements.letter) {
+  passwordErrors.password = "Password must contain at least one letter";
+}
+
+      if (!passwordRequirements.number) {
+  passwordErrors.password = "Password must contain at least one number";
+}
+
+      if (!passwordRequirements.symbol) {
+  passwordErrors.password = "Password must contain at least one symbol: !@#$%";
+}
+
+      if (object.keys(passwordErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...passwordErrors }));
+  setLoading(false);
+  return;
+      }
+
+      const confirmPassword = passwordConfirm;
+      if (password !== confirmPassword) {
+        setErrors((prev) => ({ ...prev, passwordConfirm: "Passwords do not match" }));
+        setLoading(false);
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setErrors((prev) => ({ ...prev, email: "Invalid email format" }));
+        setLoading(false);
+        return;
+      }
+
+      if (!firstName) setErrors((prev) => ({ ...prev, first_name: "First name is required" }));
+      if (!lastName) setErrors((prev) => ({ ...prev, last_name: "Last name is required" }));
+
+      if (!firstName || !lastName) {
         setLoading(false);
         return;
       }
@@ -57,6 +104,11 @@ function Form({ route, method }) {
 
     try {
       let payload;
+      const apiUrl = import.meta.env.VITE_API_URL;
+
+      const endpoint = method === "login"
+        ? `${apiUrl}/api/auth/login/`
+        : `${apiUrl}/api/auth/register/`;
 
       if (method === "login") {
         payload = { username, password };
@@ -71,9 +123,8 @@ function Form({ route, method }) {
         };
       }
 
-      const apiUrl = import.meta.env.VITE_API_URL;
 
-      const res = await fetch(`${apiUrl}/api/auth/login/`, {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -91,7 +142,6 @@ function Form({ route, method }) {
         // Save token
         localStorage.setItem(ACCESS_TOKEN, data.access);
         localStorage.setItem(REFRESH_TOKEN, data.refresh);
-        // localStorage.setItem("userType", data.user.user_type);
 
         } else {
         if (data.username) setErrors((prev) => ({ ...prev, username: data.username[0] }));
