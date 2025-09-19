@@ -1,9 +1,9 @@
 import react from "react"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import Login from "./pages/login/components/Login"
-import Register from "./pages/register/components/Register"
+import Login from "./pages/login/Login"
+import Register from "./pages/register/Register"
 import Home from "./pages/Home"
-import ClientDashboard from "./pages/ClientDashboard/components/client_index"
+import ClientDashboard from "./pages/ClientDashboard/client_index"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 
