@@ -45,15 +45,9 @@ function client_index() {
     <div>
       <h1>Client Dashboard</h1>
       <p>Welcome to the Client Dashboard!</p>
+      <a href="/">Home</a>
       <button onClick={() => setLogout(true)}>Logout</button>
       {loading && <LoadingIndicator />}
-      {userData && (
-        <div>
-          <h2>User Information</h2>
-          <p>Name: {userData.name}</p>
-          <p>Email: {userData.email}</p>
-        </div>
-      )}
     </div>
   );
 }

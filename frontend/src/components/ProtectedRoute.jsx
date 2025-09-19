@@ -47,11 +47,33 @@ function ProtectedRoute({ children }) {
         }
     };
 
+    useEffect(() => {
+        const checkAuth = async () => {
+        const token = localStorage.getItem(ACCESS_TOKEN);
+        if (!token) {
+            setIsAuthorized(false);
+            return;
+        }
+        try {
+                const res =await api.get("/api/user/");
+                if (res.status === 200) {
+                    setIsAuthorized(true);
+                } else {
+                    setIsAuthorized(false);
+                }
+            } catch (error) {
+                console.log('Auth check failed:', error);
+                setIsAuthorized(false);
+            }
+        };
+        checkAuth();
+    }, []);
+
     if (isAuthorized === null) {
-        return <div>Loading...</div>;
+        return <div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>;
     }
 
-    return isAuthorized ? children : <Navigate to="/login" />;
+    return isAuthorized ? children : <Navigate to="/login" replace />;
 }
 
 export default ProtectedRoute;
