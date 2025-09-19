@@ -9,12 +9,16 @@ import ProtectedRoute from "./components/ProtectedRoute"
 
 function Logout() {
   localStorage.clear()
-  return <Navigate to="/login" replace={true} />
+  window.location.href = '/login';
+  return <div style={{ textAlign: 'center', padding: '50px' }}>Logging out...</div>;
 }
 
 function App() {
+  
   return (
     <BrowserRouter>
+    
+      <main className="flex-1 pt-16 lg:pt-0 transition-all duration-300">
       <Routes>
         <Route
           path="/client_index"
@@ -25,19 +29,12 @@ function App() {
           }
         />
         <Route path="/" element={<Home />} />
-        {/* <Route
-          path="/admin_index"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
+      </main>
     </BrowserRouter>
   )
 }
