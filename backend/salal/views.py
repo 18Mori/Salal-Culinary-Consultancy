@@ -7,7 +7,6 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
-from .models import User
 
 class LoginView(APIView):
     permission_classes = []
