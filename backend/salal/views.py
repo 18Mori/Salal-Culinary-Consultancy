@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
-from django.db.models import Count, Sum, Q
+from django.db.models import Sum, Q
 
 class ClientDashboardView(APIView):
     authentication_classes = [JWTAuthentication]
