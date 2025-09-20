@@ -101,6 +101,7 @@ const ClientDashboardNavigation = ({ isCollapsed, onToggleCollapse }) => {
         {!isCollapsed ? (
           <div className="flex items-center space-x-3">
             User info
+            <button className="bg-red-500 text-white p-2 rounded" onClick={() => setLogout(true)}>Logout</button>
           </div>
         ) : (
           <div className="flex items-center justify-center">

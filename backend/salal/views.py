@@ -65,6 +65,7 @@ class ClientDashboardView(APIView):
             'total_projects': total_projects,
             'completed_projects': completed_projects,
             'upcoming_consultations': upcoming_consultations,
+            'total_spent': float(total_spent),
         }
 
     def get_upcoming_consultations(self, user):
