@@ -71,7 +71,6 @@ function DashboardContent({ userData, loading, setLogout }) {
     <div className="p-4 ml-30 bg-white rounded-lg shadow-md">
       <h1>Client Dashboard</h1>
       <p>Welcome to the Client Dashboard!</p>
-      <a href="/">Home</a>
       <button className="bg-red-500 text-white p-2 rounded" onClick={() => setLogout(true)}>Logout</button>
     </div>
   );

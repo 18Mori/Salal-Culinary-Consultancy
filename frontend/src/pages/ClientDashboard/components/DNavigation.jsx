@@ -19,7 +19,7 @@ const ClientDashboardNavigation = ({ isCollapsed, onToggleCollapse }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-800">Salal</span>
+            <span className="text-xl font-bold text-gray-800">Salal Culinary</span>
           </div>
         ) : (
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -49,6 +49,29 @@ const ClientDashboardNavigation = ({ isCollapsed, onToggleCollapse }) => {
 
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         <Link
+          to="/"
+          className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
+            isActive('/')
+              ? 'bg-primary text-grey shadow-md'
+              : 'text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+            />
+          </svg>
+          {!isCollapsed && <span className="ml-3">Home</span>}
+        </Link>
+        <Link
           to="/client_index"
           className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
             isActive('/client_index')
@@ -71,15 +94,13 @@ const ClientDashboardNavigation = ({ isCollapsed, onToggleCollapse }) => {
           </svg>
           {!isCollapsed && <span className="ml-3">Dashboard</span>}
         </Link>
-
-        
       </div>
 
       {/* Footer for User Info */}
       <div className="p-4 border-t border-gray-200">
         {!isCollapsed ? (
           <div className="flex items-center space-x-3">
-            
+            User info
           </div>
         ) : (
           <div className="flex items-center justify-center">
