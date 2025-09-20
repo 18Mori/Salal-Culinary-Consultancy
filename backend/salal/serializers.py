@@ -85,3 +85,16 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['id', 'subject', 'sender', 'sender_username', 'recipient', 'recipient_username', 'content', 'sent_at', 'read']
         read_only_fields = ['id', 'sent_at', 'read', 'sender_username', 'recipient_username']
+        
+class AccountStatusSerializer(serializers.ModelSerializer):
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    
+    class Meta:
+        model = AccountPlan
+        fields = ['id', 'user', 'user_username', 'plan_type', 'is_active', 'start_at']
+        read_only_fields = ['id', 'user', 'user_username', 'start_at']
+        
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined']

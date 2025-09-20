@@ -6,7 +6,76 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.utils import timezone
+from django.db.models import Count, Sum, Q
+
+class ClientDashboardView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        if not user.last_login_at:
+            user.last_login_at = timezone.now()
+            user.save(update_fields=['last_login_at'])
+            
+            # Fetch all required data
+        stats = self._get_dashboard_stats(user)
+        upcoming_consultations = self._get_upcoming_consultations(user)
+        projects = self._get_projects(user)
+        recent_messages = self._get_recent_messages(user)
+        account_status = self._get_account_status(user)
+        
+        # Serialize
+        user_data = UserInfoSerializer(user).data
+        stats_data = stats
+        consultations_data = ConsultationSerializer(upcoming_consultations, many=True).data
+        projects_data = ProjectSerializer(projects, many=True).data
+        messages_data = MessageSerializer(recent_messages, many=True).data
+        account_data = AccountStatusSerializer(account_status).data
+        
+        return Response({
+                'user': user_data,
+                'stats': stats_data,
+                'upcoming_consultations': consultations_data,
+                'projects': projects_data,
+                'recent_messages': messages_data,
+                'account_status': account_data,
+            })
+    
+    def get_dashboard_stats(self, user):
+        total_projects = Project.objects.filter(client=user).count()
+        completed_projects = Project.objects.filter(client=user, status='completed').count()
+        upcoming_consultations = Consultation.objects.filter(
+            client=user,
+            date__gte=timezone.now(),
+            status='scheduled'
+        ).count()
+
+        return {
+            'total_projects': total_projects,
+            'completed_projects': completed_projects,
+            'upcoming_consultations': upcoming_consultations,
+        }
+
+    def get_upcoming_consultations(self, user):
+        return Consultation.objects.filter(
+            client=user,
+            date__gte=timezone.now(),
+            status='scheduled'
+        ).order_by('date')[:5]
+        
+    def get_projects(self, user):
+        return Project.objects.filter(client=user).order_by('-updated_at')[:5]
+    
+    def get_recent_messages(self, user):
+        return Message.objects.filter(
+            Q(sender=user) | Q(recipient=user)
+        ).order_by('-sent_at')[:5]
+        
 
 class LoginView(APIView):
     permission_classes = []
