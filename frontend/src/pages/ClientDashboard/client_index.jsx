@@ -46,6 +46,24 @@ const toggleSidebar = () => {
     }
   }, []);
 
+  useEffect(() => {
+      fetchDashboardData();
+    const fetchDashboardData = async () => {
+    const res = await fetch('/api/dashboard/', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setUserData(data);
+    } else {
+      console.error("Error fetching dashboard data:", res.statusText);
+    }
+  };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <DNavigation 

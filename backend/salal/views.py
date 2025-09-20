@@ -48,12 +48,18 @@ class ClientDashboardView(APIView):
     
     def get_dashboard_stats(self, user):
         total_projects = Project.objects.filter(client=user).count()
-        completed_projects = Project.objects.filter(client=user, status='completed').count()
+        completed_projects = Project.objects.filter(
+            client=user, status='completed'
+            ).count()
         upcoming_consultations = Consultation.objects.filter(
             client=user,
             date__gte=timezone.now(),
             status='scheduled'
         ).count()
+        total_spent = Consultation.objects.filter(
+        client=user,
+        status='completed'
+    ).aggregate(total=Sum('price'))['total'] or 0.0
 
         return {
             'total_projects': total_projects,

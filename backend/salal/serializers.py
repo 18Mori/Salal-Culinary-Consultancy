@@ -51,7 +51,7 @@ class DashboardStatsSerializer(serializers.Serializer):
     total_projects = serializers.IntegerField()
     completed_projects = serializers.IntegerField()
     upcoming_consultations = serializers.IntegerField()
-    total_revenue = serializers.DecimalField(max_digits=10, decimal_places=2)
+    total_spent = serializers.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
 class ConsultationSerializer(serializers.ModelSerializer):
     client_username = serializers.CharField(source='client.get.username', read_only=True)
