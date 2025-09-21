@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import DNavigation from "./components/DNavigation";
 
+// const DNavigation = lazy(() => import("./components/DNavigation"));
+
 function client_index() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -66,29 +68,31 @@ const toggleSidebar = () => {
 
   return (
     <div className="min-h-screen bg-background">
+        {/* <Suspense fallback={<div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>}>
+        </Suspense> */}
       <DNavigation 
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={toggleSidebar}
+        setLogout={setLogout} 
       />
       <main className={`ml-${sidebarCollapsed ? '16' : '64'} p-4 transition-all duration-300`}>
         <DashboardContent 
           userData={userData} 
           loading={loading} 
-          setLogout={setLogout} 
         />
       </main>
     </div>
   );
 }
 
-function DashboardContent({ userData, loading, setLogout }) {
+function DashboardContent({ userData, loading }) {
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>;
   }
   return (
     // Placeholder for dashboard content
-    <div className="flex flex-col min-h-screen bg-gray-100">
-    <div className="flex-1">
+    <div className="flex flex-col px-auto min-h-screen bg-white">
+    <div className="container mx-auto pl-6">
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>

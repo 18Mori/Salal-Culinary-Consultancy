@@ -1,11 +1,14 @@
 import react from "react"
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Login from "./pages/login/Login"
 import Register from "./pages/register/Register"
 import Home from "./pages/Home"
 import ClientDashboard from "./pages/ClientDashboard/client_index"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
+import About from "./pages/About"
+import Services from "./pages/Services"
+import Contact from "./pages/Contact"
 
 function Logout() {
   localStorage.clear()
@@ -29,6 +32,9 @@ function App() {
           }
         />
         <Route path="/" element={<Home />} />
+        <Route path="/About" element={<About />} />
+        <Route path="/Services" element={<Services />} />
+        <Route path="/Contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<Register />} />
