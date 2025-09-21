@@ -54,7 +54,7 @@ const HomeNav = () => {
           <div className="pt-4 border-t border-border lg:border-t-0 lg:pt-0">
             <Link
               to="/login"
-              className="px-4 py-2 bg-primary text-black rounded-md text-sm font-medium hover:bg-primary/90 transition-colors duration-200"
+              className="px-4 py-2 bg-primary text-black-200 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors duration-200"
             >
               Login
             </Link>

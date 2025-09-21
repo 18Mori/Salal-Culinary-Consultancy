@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DNavigation from "./components/DNavigation";
+import LoadingIndicator from "../../components/LoadingIndicator";
 
-// const DNavigation = lazy(() => import("./components/DNavigation"));
 
 function client_index() {
   const [logout, setLogout] = useState(false);
@@ -68,8 +68,6 @@ const toggleSidebar = () => {
 
   return (
     <div className="min-h-screen bg-background">
-        {/* <Suspense fallback={<div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>}>
-        </Suspense> */}
       <DNavigation 
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={toggleSidebar}
@@ -87,7 +85,7 @@ const toggleSidebar = () => {
 
 function DashboardContent({ userData, loading }) {
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>;
+    return <LoadingIndicator />;
   }
   return (
     // Placeholder for dashboard content
