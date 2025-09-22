@@ -8,6 +8,8 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import About from "./pages/About"
 import Services from "./pages/Services"
 import Contact from "./pages/Contact"
+import Booking from "./pages/ClientDashboard/components/page/Booking"
+import Payment from "./pages/ClientDashboard/components/page/Payment"
 import LoadingIndicator from "./components/LoadingIndicator"
 import { Suspense, lazy } from "react";
 
@@ -39,6 +41,26 @@ function App() {
             <MainLayout>
               <ProtectedRoute>
                 <ClientDashboard />
+              </ProtectedRoute>
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/booking"
+          element={
+            <MainLayout>
+              <ProtectedRoute>
+                <Booking />
+              </ProtectedRoute>
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/payment"
+          element={
+            <MainLayout>
+              <ProtectedRoute>
+                <Payment />
               </ProtectedRoute>
             </MainLayout>
           }
