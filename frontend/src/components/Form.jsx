@@ -151,6 +151,7 @@ function Form({ route, method }) {
       // Save tokens and redirect
       localStorage.setItem(ACCESS_TOKEN, data.access);
       localStorage.setItem(REFRESH_TOKEN, data.refresh);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       if (data.user && data.user.user_type === "admin") {
         navigate("/admin_index");
