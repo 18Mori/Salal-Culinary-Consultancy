@@ -2,18 +2,29 @@ import react from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Login from "./pages/login/Login"
 import Register from "./pages/register/Register"
-import Home from "./pages/Home"
 import ClientDashboard from "./pages/ClientDashboard/client_index"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import About from "./pages/About"
 import Services from "./pages/Services"
 import Contact from "./pages/Contact"
+import LoadingIndicator from "./components/LoadingIndicator"
+import { Suspense, lazy } from "react";
+
 
 function Logout() {
-  localStorage.clear()
+  localStorage.clear();
   window.location.href = '/login';
   return <div style={{ textAlign: 'center', padding: '50px' }}>Logging out...</div>;
+}
+const Home = lazy(() => import("./pages/Home"));
+
+function MainLayout({ children }) {
+  return (
+    <main className="flex-1 pt-16 lg:pt-0 transition-all duration-300">
+      {children}
+    </main>
+  );
 }
 
 function App() {
@@ -21,26 +32,35 @@ function App() {
   return (
     <BrowserRouter>
     
-      <main className="flex-1 pt-16 lg:pt-0 transition-all duration-300">
       <Routes>
-        <Route
+      <Route
           path="/client_index"
           element={
-            <ProtectedRoute>
-              <ClientDashboard />
-            </ProtectedRoute>
+            <MainLayout>
+              <ProtectedRoute>
+                <ClientDashboard />
+              </ProtectedRoute>
+            </MainLayout>
           }
         />
-        <Route path="/" element={<Home />} />
-        <Route path="/About" element={<About />} />
-        <Route path="/Services" element={<Services />} />
-        <Route path="/Contact" element={<Contact />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="*" element={<NotFound />}></Route>
+        <Route
+          path="/"
+          element={
+            <Suspense fallback={<LoadingIndicator />}>
+              <MainLayout>
+                <Home />
+              </MainLayout>
+            </Suspense>
+          }
+        />
+        <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+        <Route path="/services" element={<MainLayout><Services /></MainLayout>} />
+        <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
+        <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
+        <Route path="/logout" element={<MainLayout><Logout /></MainLayout>} />
+        <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
+        <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
       </Routes>
-      </main>
     </BrowserRouter>
   )
 }

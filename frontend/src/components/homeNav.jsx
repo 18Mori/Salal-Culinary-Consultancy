@@ -1,7 +1,16 @@
-import React  from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const HomeNav = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    setIsAuthenticated(!!token);
+  }, []);
+
+
   const navigationItems = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About" },
@@ -10,7 +19,7 @@ const HomeNav = () => {
   ];
 
    const isActivePath = (path) => {
-    return window.location.pathname === path;
+    return location.pathname === path;
   };
 
   return (
@@ -50,15 +59,25 @@ const HomeNav = () => {
               </Link>
             ))}
           </div>
-          
+          {isAuthenticated ? (
+              <div className="pt-4 border-t border-border lg:border-t-0 lg:pt-0">
+                <Link
+                  to="/client_index"
+                  className="px-4 py-2 bg-primary text-black rounded-md text-sm font-medium hover:bg-primary/90 transition-colors duration-200"
+                >
+                  Dashboard
+                </Link>
+              </div>
+            ) : (
           <div className="pt-4 border-t border-border lg:border-t-0 lg:pt-0">
             <Link
               to="/login"
-              className="px-4 py-2 bg-primary text-black-200 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors duration-200"
+              className="px-4 py-2 bg-primary text-black rounded-md text-sm font-medium hover:bg-primary/90 transition-colors duration-200"
             >
               Login
             </Link>
           </div>
+            )}
           </div>
       </nav>
       </header>
