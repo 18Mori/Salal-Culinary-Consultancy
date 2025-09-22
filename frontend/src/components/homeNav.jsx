@@ -59,7 +59,7 @@ const HomeNav = () => {
               </Link>
             ))}
           </div>
-          {isAuthenticated ? (
+          {!isAuthenticated ? (
               <div className="pt-4 border-t border-border lg:border-t-0 lg:pt-0">
                 <Link
                   to="/client_index"
