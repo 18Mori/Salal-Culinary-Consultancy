@@ -53,29 +53,14 @@ class DashboardStatsSerializer(serializers.Serializer):
     upcoming_consultations = serializers.IntegerField()
     total_spent = serializers.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
-class ConsultationSerializer(serializers.ModelSerializer):
+class BookingSerializer(serializers.ModelSerializer):
     client_username = serializers.CharField(source='client.get.username', read_only=True)
     
     class Meta:
-        model = Consultation
-        fields = ['id', 'client', 'client_username', 'title', 'date', 'duration_minutes', 'notes', 'status', 'created_at']
+        model = Booking
+        fields = ['id', 'client', 'title', 'date', 'time', 'notes', 'service_type', 'status', 'created_at', 'updated_at', 'session_type']
         read_only_fields = ['id', 'created_at', 'client_username']
         
-class ProjectSerializer(serializers.ModelSerializer):
-    client_username = serializers.CharField(source='client.get.username', read_only=True)
-    
-    class Meta:
-        model = Project
-        fields = ['id', 'client', 'client_username', 'name', 'description', 'start_date', 'end_date', 'progress_percent', 'status', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at', 'client_username']
-        
-class AccountPlanSerializer(serializers.ModelSerializer):
-    user_username = serializers.CharField(source='user.username', read_only=True)
-    
-    class Meta:
-        model = AccountPlan
-        fields = ['id', 'user', 'user_username', 'plan_type', 'started_at', 'expires_at']
-        read_only_fields = ['id', 'started_at', 'expires_at', 'user_username']
         
 class MessageSerializer(serializers.ModelSerializer):
     sender_username = serializers.CharField(source='sender.get.username', read_only=True)
@@ -85,6 +70,14 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['id', 'subject', 'sender', 'sender_username', 'recipient', 'recipient_username', 'content', 'sent_at', 'read']
         read_only_fields = ['id', 'sent_at', 'read', 'sender_username', 'recipient_username']
+        
+class AccountPlanSerializer(serializers.ModelSerializer):
+    user_username = serializers.CharField(source='user.username', read_only=True)
+    
+    class Meta:
+        model = AccountPlan
+        fields = ['id', 'user', 'user_username', 'plan_type', 'started_at', 'expires_at']
+        read_only_fields = ['id', 'started_at', 'expires_at', 'user_username']
         
 class AccountStatusSerializer(serializers.ModelSerializer):
     user_username = serializers.CharField(source='user.username', read_only=True)

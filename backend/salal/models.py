@@ -1,58 +1,34 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-class Consultation(models.Model):
-    client = models.ForeignKey(User, on_delete=models.CASCADE)
+class Booking(models.Model):
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
     title = models.CharField(max_length=200)
-    date = models.DateTimeField()
-    duration_minutes = models.PositiveIntegerField(default=60)
-    notes = models.TextField(blank=True)
+    date = models.DateField(default=datetime.date.today)
+    time = models.TimeField(default=timezone.now)
+    notes = models.TextField(null=True, blank=True)
+    service_type = models.CharField(max_length=100)
     status = models.CharField(max_length=20, choices=[
-          ('scheduled', 'Scheduled'),
-          ('completed', 'Completed'),
-          ('cancelled', 'Cancelled'),
-      ], default='scheduled')
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-      ordering = ['-date']
-      
-    def __str__(self):
-      return f"{self.title} with {self.client.username} on {self.date.strftime('%Y-%m-%d %H:%M')}"
-    
-    def is_upcoming(self):
-      return self.date > timezone.now()
-    
-    def is_past(self):
-      return self.date <= timezone.now()
-    
-    def mark_completed(self):
-      self.status = 'completed'
-      self.save()
-      
-    def mark_cancelled(self):
-      self.status = 'cancelled'
-      self.save()
-    
-class Project(models.Model):
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    start_date = models.DateField()
-    end_date = models.DateField()
-    progress_percent = models.PositiveSmallIntegerField(default=0)  
-    status = models.CharField(max_length=20, choices=[
-        ('planning', 'Planning'),
-        ('in_progress', 'In Progress'),
-        ('on_hold', 'On Hold'),
+        ('scheduled', 'Scheduled'),
         ('completed', 'Completed'),
-    ], default='planning')
+        ('canceled', 'Canceled'),
+    ], default='scheduled')
+    session_type = models.CharField(max_length=20, choices=[
+        ('video', 'Video Call'),
+        ('in-person', 'In-Person'),
+        ('phone', 'Phone Call'),
+    ])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+      ordering = ['-created_at']
+      unique_together = ('client', 'date', 'time', 'service_type')
+    
     def __str__(self):
-        return f"{self.name} ({self.client.username})"
+        return f"{self.title} on {self.date} at {self.time} by {self.client.username}"
       
 class AccountPlan(models.Model):
     PLAN_CHOICES = [
@@ -82,7 +58,7 @@ class AccountPlan(models.Model):
 class Messages(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
-    subject = models.CharField(max_length=200)
+    subject = models.CharField(null=True, max_length=200)
     content = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
