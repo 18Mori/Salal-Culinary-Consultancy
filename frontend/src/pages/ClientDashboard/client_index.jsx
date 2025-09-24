@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import DNavigation from "./components/DNavigation";
 import LoadingIndicator from "../../components/LoadingIndicator";
+import DStats from "./components/DStats";
 
 
 function client_index() {
@@ -88,8 +89,6 @@ function DashboardContent({ userData, loading }) {
     return <LoadingIndicator />;
   }
   return (
-    // Placeholder for dashboard content
-    <div className="flex flex-col px-auto min-h-screen bg-white">
     <div className="container mx-auto pl-6">
           <div className="mb-8">
             <div className="flex items-center justify-between">
@@ -111,9 +110,10 @@ function DashboardContent({ userData, loading }) {
               </div>
             </div>
           </div>
+          <div className="mb-8">
+            <DStats stats={userData?.dashboard_stats} />
+          </div>
            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Dashboard Stats */}
-            
             {/* Support Card */}
             <div className="bg-card border border-border rounded-lg p-6">
               <div className="flex items-center space-x-3 mb-4">
@@ -193,7 +193,6 @@ function DashboardContent({ userData, loading }) {
               </div>
             </div>
           </div>
-    </div>
     </div>
 
     

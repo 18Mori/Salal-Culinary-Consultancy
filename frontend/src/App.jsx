@@ -9,8 +9,7 @@ import About from "./pages/About"
 import Services from "./pages/Services"
 import Contact from "./pages/Contact"
 import Booking from "./pages/ClientDashboard/components/page/Booking"
-import Payment from "./pages/ClientDashboard/components/page/Payment"
-import Profile from "./pages/ClientDashboard/components/page/Profile"
+import Bill from "./pages/ClientDashboard/components/page/Bill"
 import Chat from "./pages/ClientDashboard/components/page/Chat"
 import LoadingIndicator from "./components/LoadingIndicator"
 import { Suspense, lazy } from "react";
@@ -58,11 +57,11 @@ function App() {
           }
         />
         <Route
-          path="/payment"
+          path="/bill"
           element={
             <MainLayout>
               <ProtectedRoute>
-                <Payment />
+                <Bill />
               </ProtectedRoute>
             </MainLayout>
           }
@@ -73,16 +72,6 @@ function App() {
             <MainLayout>
               <ProtectedRoute>
                 <Chat />
-              </ProtectedRoute>
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <MainLayout>
-              <ProtectedRoute>
-                <Profile />
               </ProtectedRoute>
             </MainLayout>
           }

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import DNavigation from "../../../ClientDashboard/components/DNavigation";
+import DNavigation from "../DNavigation";
 
-
-function Profile() {
+function Bill() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -71,12 +70,12 @@ function DashboardContent({ userData, loading }) {
     return <LoadingIndicator />;
   }
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Profile Page</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Bill Page</h1>
     </div>
 
     
   );
 };
 
-export default Profile;
+export default Bill;
