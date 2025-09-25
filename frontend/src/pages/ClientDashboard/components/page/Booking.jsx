@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import DNavigation from "../../../ClientDashboard/components/DNavigation";
+import BookingForm from "../../../../components/BookingForm";
 
 
 function Booking() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => {
   setSidebarCollapsed(!sidebarCollapsed);
@@ -72,7 +73,7 @@ function DashboardContent({ userData, loading }) {
   }
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Booking Page</h1>
+      <BookingForm />
     </div>
 
     

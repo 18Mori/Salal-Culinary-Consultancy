@@ -6,15 +6,11 @@ from django.utils import timezone
 class Booking(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
     title = models.CharField(max_length=200)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField(null=True, default=datetime.date.today)
     time = models.TimeField(default=timezone.now)
+    duration = models.DurationField(null=True, default=datetime.timedelta(minutes=60))
     notes = models.TextField(null=True, blank=True)
     service_type = models.CharField(max_length=100)
-    status = models.CharField(max_length=20, choices=[
-        ('scheduled', 'Scheduled'),
-        ('completed', 'Completed'),
-        ('canceled', 'Canceled'),
-    ], default='scheduled')
     session_type = models.CharField(max_length=20, choices=[
         ('video', 'Video Call'),
         ('in-person', 'In-Person'),

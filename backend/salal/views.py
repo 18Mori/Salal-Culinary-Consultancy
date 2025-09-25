@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .serializers import *
 from .models import *
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,6 +11,8 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
 from django.db.models import Sum, Q
+import logging
+logger = logging.getLogger(__name__)
 
 class ClientDashboardView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -32,57 +35,56 @@ class ClientDashboardView(APIView):
         # Serialize
         user_data = UserInfoSerializer(user).data
         stats_data = stats
-        consultations_data = ConsultationSerializer(upcoming_consultations, many=True).data
-        projects_data = ProjectSerializer(projects, many=True).data
         messages_data = MessageSerializer(recent_messages, many=True).data
         account_data = AccountStatusSerializer(account_status).data
         
         return Response({
                 'user': user_data,
                 'stats': stats_data,
-                'upcoming_consultations': consultations_data,
-                'projects': projects_data,
+                'upcoming_consultations': BookingSerializer(upcoming_consultations, many=True).data,
                 'recent_messages': messages_data,
                 'account_status': account_data,
             })
-    
-    def get_dashboard_stats(self, user):
-        total_projects = Project.objects.filter(client=user).count()
-        completed_projects = Project.objects.filter(
-            client=user, status='completed'
-            ).count()
-        upcoming_consultations = Consultation.objects.filter(
-            client=user,
-            date__gte=timezone.now(),
-            status='scheduled'
-        ).count()
-        total_spent = Consultation.objects.filter(
-        client=user,
-        status='completed'
-    ).aggregate(total=Sum('price'))['total'] or 0.0
-
-        return {
-            'total_projects': total_projects,
-            'completed_projects': completed_projects,
-            'upcoming_consultations': upcoming_consultations,
-            'total_spent': float(total_spent),
-        }
-
-    def get_upcoming_consultations(self, user):
-        return Consultation.objects.filter(
-            client=user,
-            date__gte=timezone.now(),
-            status='scheduled'
-        ).order_by('date')[:5]
-        
-    def get_projects(self, user):
-        return Project.objects.filter(client=user).order_by('-updated_at')[:5]
     
     def get_recent_messages(self, user):
         return Message.objects.filter(
             Q(sender=user) | Q(recipient=user)
         ).order_by('-sent_at')[:5]
         
+        
+class BookingView(APIView):
+    authentication_classes = [JWTAuthentication]
+    
+    def get(self, request):
+        user = request.user
+        bookings = Booking.objects.filter(client=user).order_by('-date', '-time')
+        serializer = BookingSerializer(bookings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        user = request.user
+        data = request.data.copy()
+        data['client'] = user.id
+        
+        serializer = BookingSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    @api_view(['POST'])
+    def create_booking(request):
+        logger.info(f"Received booking data: {request.data}")  
+        logger.info(f"User: {request.user}")
+
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save(user=request.user)
+            logger.info(f"Booking created: {booking.id}")
+            return Response(BookingSerializer(booking).data, status=201)
+        else:
+            logger.error(f"Serializer errors: {serializer.errors}")
+            return Response(serializer.errors, status=400)
 
 class LoginView(APIView):
     permission_classes = []

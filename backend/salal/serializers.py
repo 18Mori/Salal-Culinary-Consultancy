@@ -58,7 +58,7 @@ class BookingSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Booking
-        fields = ['id', 'client', 'title', 'date', 'time', 'notes', 'service_type', 'status', 'created_at', 'updated_at', 'session_type']
+        fields = ['id', 'client', 'client_username', 'title', 'date', 'time', 'notes', 'duration', 'service_type', 'created_at', 'updated_at', 'session_type']
         read_only_fields = ['id', 'created_at', 'client_username']
         
         
