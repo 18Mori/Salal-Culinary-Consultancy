@@ -28,7 +28,7 @@ class Booking(models.Model):
       
 class AccountPlan(models.Model):
     PLAN_CHOICES = [
-        ('free', 'Free'),
+        ('standard', 'Standard'),
         ('basic', 'Basic'),
         ('premium', 'Premium'),
     ]
@@ -50,17 +50,3 @@ class AccountPlan(models.Model):
         self.is_active = False
         self.end_date = timezone.now().date()
         self.save()
-        
-class Messages(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
-    subject = models.CharField(null=True, max_length=200)
-    content = models.TextField()
-    sent_at = models.DateTimeField(auto_now_add=True)
-    read = models.BooleanField(default=False)
-    
-    class Meta:
-        ordering = ['-sent_at']
-
-    def __str__(self):
-        return f"Message from {self.sender.username} to {self.recipient.username} at {self.sent_at.strftime('%Y-%m-%d %H:%M')}"

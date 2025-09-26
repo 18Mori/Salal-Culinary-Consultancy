@@ -36,6 +36,7 @@ const toggleSidebar = () => {
           }
           return response.json();
         })
+        .then((response) => response.json())
         .then((data) => {
           setUserData(data);
           setLoading(false);
@@ -48,24 +49,6 @@ const toggleSidebar = () => {
       setLoading(false);
     }
   }, []);
-
-  // useEffect(() => {
-  //     fetchDashboardData();
-  //   const fetchDashboardData = async () => {
-  //   const res = await fetch('/api/dashboard/', {
-  //     method: 'GET',
-  //     headers: {
-  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //     },
-  //   });
-  //   if (res.ok) {
-  //     const data = await res.json();
-  //     setUserData(data);
-  //   } else {
-  //     console.error("Error fetching dashboard data:", res.statusText);
-  //   }
-  // };
-  // }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -88,13 +71,14 @@ function DashboardContent({ userData, loading }) {
   if (loading) {
     return <LoadingIndicator />;
   }
+  console.log("User Data from API:", userData);
   return (
     <div className="container mx-auto pl-20">
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
-                  Welcome back, {userData?.first_name || 'User'}!
+                  Welcome back, {userData?.first_name?.trim() || 'User'}!
                 </h1>
                 <p className="text-muted-foreground mt-1">
                   Here's what's happening with your consultancy projects
@@ -102,7 +86,8 @@ function DashboardContent({ userData, loading }) {
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">
-                  Last login: {new Date(userData?.last_login.data.timezone).toLocaleString() || 'N/A'}
+                  Last login: {userData?.last_login ? new Date(userData.last_login).toLocaleString() : 'Unknown'}
+                  {new Date().getFullYear()}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Account Status: {userData?.account_plan?.plan_type === 'premium' ? 'Premium Client' : 'Standard'}

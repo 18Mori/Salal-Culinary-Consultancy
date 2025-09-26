@@ -28,29 +28,14 @@ class ClientDashboardView(APIView):
             # Fetch all required data
         stats = self._get_dashboard_stats(user)
         upcoming_consultations = self._get_upcoming_consultations(user)
-        projects = self._get_projects(user)
-        recent_messages = self._get_recent_messages(user)
-        account_status = self._get_account_status(user)
         
         # Serialize
-        user_data = UserInfoSerializer(user).data
         stats_data = stats
-        messages_data = MessageSerializer(recent_messages, many=True).data
-        account_data = AccountStatusSerializer(account_status).data
         
         return Response({
-                'user': user_data,
                 'stats': stats_data,
                 'upcoming_consultations': BookingSerializer(upcoming_consultations, many=True).data,
-                'recent_messages': messages_data,
-                'account_status': account_data,
             })
-    
-    def get_recent_messages(self, user):
-        return Message.objects.filter(
-            Q(sender=user) | Q(recipient=user)
-        ).order_by('-sent_at')[:5]
-        
         
 class BookingView(APIView):
     authentication_classes = [JWTAuthentication]

@@ -1,4 +1,3 @@
-from email.message import Message
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import *
@@ -54,14 +53,3 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['id', 'client', 'client_username', 'title', 'date', 'time', 'notes', 'duration', 'service_type', 'created_at', 'updated_at', 'session_type']
         read_only_fields = ['id', 'created_at', 'client_username']
-        
-        
-class MessageSerializer(serializers.ModelSerializer):
-    sender_username = serializers.CharField(source='sender.get.username', read_only=True)
-    recipient_username = serializers.CharField(source='recipient.get.username', read_only=True)
-
-    class Meta:
-        model = Message
-        fields = ['id', 'subject', 'sender', 'sender_username', 'recipient', 'recipient_username', 'content', 'sent_at', 'read']
-        read_only_fields = ['id', 'sent_at', 'read', 'sender_username', 'recipient_username']
-        
