@@ -89,7 +89,7 @@ function DashboardContent({ userData, loading }) {
     return <LoadingIndicator />;
   }
   return (
-    <div className="container mx-auto pl-6">
+    <div className="container mx-auto pl-20">
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -110,10 +110,10 @@ function DashboardContent({ userData, loading }) {
               </div>
             </div>
           </div>
-          <div className="mb-8">
-            <DStats stats={userData?.dashboard_stats} />
+          <div>
+                    <DStats stats={userData?.dashboard_stats} />
           </div>
-           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {/* Support Card */}
             <div className="bg-card border border-border rounded-lg p-6">
               <div className="flex items-center space-x-3 mb-4">
@@ -129,7 +129,7 @@ function DashboardContent({ userData, loading }) {
                   <span className="font-medium">Email:</span> support@salalculinary.com
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-medium">Phone:</span> +1 (555) 123-4567
+                  <span className="font-medium">Phone:</span> +254 729384028
                 </p>
                 <p className="text-xs text-muted-foreground">
                   <span className="font-medium">Hours:</span> Mon-Fri 9AM-6PM EST
@@ -152,44 +152,6 @@ function DashboardContent({ userData, loading }) {
                 <p>• Staff Training Guidelines</p>
                 <p>• Menu Costing Templates</p>
                 <p>• Industry Best Practices Guide</p>
-              </div>
-            </div>
-
-            {/* Account Status Card */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-success/10 rounded-lg flex items-center justify-center">
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">Account Status</h3>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Plan</span>
-                  <span className="text-sm font-medium text-foreground">
-                    {userData?.account_plan?.plan_type === 'premium' ? 'Premium' : 'Basic'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Consultations Used</span>
-                  <span className="text-sm font-medium text-foreground">
-                    {userData?.account_plan?.consultations_used} / {userData?.account_plan?.consultations_allowed}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Next Billing</span>
-                  <span className="text-sm font-medium text-foreground">
-                    Jan 15, 2026
-                  </span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2 mt-3">
-                  <div 
-                    className="bg-success h-2 rounded-full" 
-                    style={{ width: `${Math.min(100, (userData?.account_plan?.consultations_used / userData?.account_plan?.consultations_allowed) * 100)}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  NaN consultations remaining this billing cycle
-                </p>
               </div>
             </div>
           </div>

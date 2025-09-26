@@ -46,13 +46,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
         )
         return user
-    
-class DashboardStatsSerializer(serializers.Serializer):
-    total_projects = serializers.IntegerField()
-    completed_projects = serializers.IntegerField()
-    upcoming_consultations = serializers.IntegerField()
-    total_spent = serializers.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    
+
 class BookingSerializer(serializers.ModelSerializer):
     client_username = serializers.CharField(source='client.get.username', read_only=True)
     
@@ -71,23 +65,3 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ['id', 'subject', 'sender', 'sender_username', 'recipient', 'recipient_username', 'content', 'sent_at', 'read']
         read_only_fields = ['id', 'sent_at', 'read', 'sender_username', 'recipient_username']
         
-class AccountPlanSerializer(serializers.ModelSerializer):
-    user_username = serializers.CharField(source='user.username', read_only=True)
-    
-    class Meta:
-        model = AccountPlan
-        fields = ['id', 'user', 'user_username', 'plan_type', 'started_at', 'expires_at']
-        read_only_fields = ['id', 'started_at', 'expires_at', 'user_username']
-        
-class AccountStatusSerializer(serializers.ModelSerializer):
-    user_username = serializers.CharField(source='user.username', read_only=True)
-    
-    class Meta:
-        model = AccountPlan
-        fields = ['id', 'user', 'user_username', 'plan_type', 'is_active', 'start_at']
-        read_only_fields = ['id', 'user', 'user_username', 'start_at']
-        
-class UserInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined']

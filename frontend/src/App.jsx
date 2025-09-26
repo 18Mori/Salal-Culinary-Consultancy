@@ -1,13 +1,8 @@
 import react from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Login from "./pages/login/Login"
-import Register from "./pages/register/Register"
 import ClientDashboard from "./pages/ClientDashboard/client_index"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
-import About from "./pages/About"
-import Services from "./pages/Services"
-import Contact from "./pages/Contact"
 import Booking from "./pages/ClientDashboard/components/page/Booking"
 import Bill from "./pages/ClientDashboard/components/page/Bill"
 import Chat from "./pages/ClientDashboard/components/page/Chat"
@@ -21,6 +16,12 @@ function Logout() {
   return <div style={{ textAlign: 'center', padding: '50px' }}>Logging out...</div>;
 }
 const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/login/Login"));
+const Register = lazy(() => import("./pages/register/Register"));
+const About = lazy(() => import("./pages/About"));
+const Services = lazy(() => import("./pages/Services"));
+const Contact = lazy(() => import("./pages/Contact"));
+
 
 function MainLayout({ children }) {
   return (
@@ -86,12 +87,36 @@ function App() {
             </Suspense>
           }
         />
-        <Route path="/about" element={<MainLayout><About /></MainLayout>} />
-        <Route path="/services" element={<MainLayout><Services /></MainLayout>} />
-        <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
-        <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
-        <Route path="/logout" element={<MainLayout><Logout /></MainLayout>} />
-        <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
+        <Route path="/about" element={
+          <Suspense fallback={<LoadingIndicator />}>
+            <MainLayout><About /></MainLayout>
+          </Suspense>
+          } />
+        <Route path="/services" element={
+          <Suspense fallback={<LoadingIndicator />}>
+          <MainLayout><Services /></MainLayout>
+          </Suspense>
+      } />
+        <Route path="/contact" element={
+          <Suspense fallback={<LoadingIndicator />}>
+          <MainLayout><Contact /></MainLayout>
+          </Suspense>
+      } />
+        <Route path="/login" element={
+          <Suspense fallback={<LoadingIndicator />}>
+          <MainLayout><Login /></MainLayout>
+          </Suspense>
+          } />
+        <Route path="/logout" element={
+          <Suspense fallback={<LoadingIndicator />}>
+          <MainLayout><Logout /></MainLayout>
+          </Suspense>
+          } />
+        <Route path="/register" element={
+          <Suspense fallback={<LoadingIndicator />}>
+          <MainLayout><Register /></MainLayout>
+          </Suspense>
+          } />
         <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
       </Routes>
     </BrowserRouter>

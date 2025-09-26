@@ -32,7 +32,7 @@ const HomeNav = () => {
             className="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-200"
           >
             <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
-              <p>icon</p>
+              <img src="chef-hat.png" alt="Chef Hat" />
             </div>
             <div className="flex flex-col">
               <span className="font-heading font-semibold text-lg text-foreground leading-tight">
@@ -59,16 +59,6 @@ const HomeNav = () => {
               </Link>
             ))}
           </div>
-          {!isAuthenticated ? (
-              <div className="pt-4 border-t border-border lg:border-t-0 lg:pt-0">
-                <Link
-                  to="/client_index"
-                  className="px-4 py-2 bg-primary text-black rounded-md text-sm font-medium hover:bg-primary/90 transition-colors duration-200"
-                >
-                  Dashboard
-                </Link>
-              </div>
-            ) : (
           <div className="pt-4 border-t border-border lg:border-t-0 lg:pt-0">
             <Link
               to="/login"
@@ -77,7 +67,6 @@ const HomeNav = () => {
               Login
             </Link>
           </div>
-            )}
           </div>
       </nav>
       </header>
