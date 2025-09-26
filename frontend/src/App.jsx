@@ -5,7 +5,6 @@ import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Booking from "./pages/ClientDashboard/components/page/Booking"
 import Bill from "./pages/ClientDashboard/components/page/Bill"
-import Chat from "./pages/ClientDashboard/components/page/Chat"
 import LoadingIndicator from "./components/LoadingIndicator"
 import { Suspense, lazy } from "react";
 
@@ -63,16 +62,6 @@ function App() {
             <MainLayout>
               <ProtectedRoute>
                 <Bill />
-              </ProtectedRoute>
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            <MainLayout>
-              <ProtectedRoute>
-                <Chat />
               </ProtectedRoute>
             </MainLayout>
           }

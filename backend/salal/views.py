@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .serializers import *
 from .models import *
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
-from django.db.models import Sum, Q
+from rest_framework.authentication import TokenAuthentication
 import logging
 logger = logging.getLogger(__name__)
 
@@ -45,31 +45,28 @@ class BookingView(APIView):
         bookings = Booking.objects.filter(client=user).order_by('-date', '-time')
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+    @api_view(['POST'])
+    @permission_classes([IsAuthenticated])
     def post(self, request):
         user = request.user
         data = request.data.copy()
         data['client'] = user.id
         
-        serializer = BookingSerializer(data=data)
+        serializer = BookingSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        try:
+            booking = Booking.objects.get(pk=pk, client=request.user)
+            booking.delete()
+            return Response({"message": "Booking deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Booking.DoesNotExist:
+            return Response({"error": "Booking not found or access denied"}, status=status.HTTP_404_NOT_FOUND)
         
-    @api_view(['POST'])
-    def create_booking(request):
-        logger.info(f"Received booking data: {request.data}")  
-        logger.info(f"User: {request.user}")
 
-        serializer = BookingSerializer(data=request.data)
-        if serializer.is_valid():
-            booking = serializer.save(user=request.user)
-            logger.info(f"Booking created: {booking.id}")
-            return Response(BookingSerializer(booking).data, status=201)
-        else:
-            logger.error(f"Serializer errors: {serializer.errors}")
-            return Response(serializer.errors, status=400)
 
 class LoginView(APIView):
     permission_classes = []

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import DNavigation from "../../../ClientDashboard/components/DNavigation";
 import BookingForm from "../../../../components/BookingForm";
+import BookingList from "./BookingList";
+
 
 
 function Booking() {
@@ -29,12 +31,7 @@ function Booking() {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
+        .then((response) => response.json())
         .then((data) => {
           setUserData(data);
           setLoading(false);
@@ -56,7 +53,7 @@ function Booking() {
         onToggleCollapse={toggleSidebar}
         setLogout={setLogout} 
       />
-      <main className={`ml-${sidebarCollapsed ? '16' : '64'} p-4 transition-all duration-300`}>
+      <main className={`${sidebarCollapsed ? 'ml-16' : 'ml-64'} p-4 transition-all duration-300`}>
         <DashboardContent 
           userData={userData} 
           loading={loading} 
@@ -72,8 +69,9 @@ function DashboardContent({ userData, loading }) {
     return <LoadingIndicator />;
   }
   return (
-    <div className="container mx-auto p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
       <BookingForm />
+      <BookingList />
     </div>
 
     
