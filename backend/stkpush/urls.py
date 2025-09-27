@@ -1,8 +1,6 @@
-from django.urls import path
-from . import views
+# from django.urls import path
+# from . import views
 
-urlpatterns = [
-    path('stk-push/', views.stk_push, name='stk_push'),
-    path('callback/', views.mpesa_callback, name='mpesa_callback'),
-    path('test/', views.test_view, name='test'),
-]
+# urlpatterns = [
+#     path('stk-push/', views.stk_push, name='stk_push'),
+# ]
