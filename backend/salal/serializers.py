@@ -53,10 +53,3 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['id', 'client', 'client_username', 'title', 'date', 'time', 'notes', 'duration', 'service_type', 'created_at', 'updated_at', 'session_type']
         read_only_fields = ['id', 'created_at', 'client_username']
-        
-        
-        
-class MpesaRequestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MpesaRequest
-        fields = ['phone_number', 'amount', 'account_reference', 'transaction_desc']
