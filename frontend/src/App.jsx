@@ -18,8 +18,6 @@ const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/login/Login"));
 const Register = lazy(() => import("./pages/register/Register"));
 const About = lazy(() => import("./pages/About"));
-const Services = lazy(() => import("./pages/Services"));
-const Contact = lazy(() => import("./pages/Contact"));
 
 
 function MainLayout({ children }) {
@@ -81,16 +79,6 @@ function App() {
             <MainLayout><About /></MainLayout>
           </Suspense>
           } />
-        <Route path="/services" element={
-          <Suspense fallback={<LoadingIndicator />}>
-          <MainLayout><Services /></MainLayout>
-          </Suspense>
-      } />
-        <Route path="/contact" element={
-          <Suspense fallback={<LoadingIndicator />}>
-          <MainLayout><Contact /></MainLayout>
-          </Suspense>
-      } />
         <Route path="/login" element={
           <Suspense fallback={<LoadingIndicator />}>
           <MainLayout><Login /></MainLayout>

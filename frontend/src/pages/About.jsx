@@ -155,28 +155,6 @@ const About = () => {
             Schedule a free consultation today and discover how our expertise can elevate your operation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {!isAuthenticated ? (
-              <>
-                <button
-                  variant="default"
-                  size="lg"
-                  iconName="Calendar"
-                  iconPosition="left"
-                  onClick={() => navigate('/login')}
-                  className="px-8 py-3 bg-white text-primary hover:bg-gray-100 transition-colors"
-                >
-                  Book Free Consultation
-                </button>
-                <button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => navigate('/services')}
-                  className="px-8 py-3 border-white/30 hover:bg-white/10 transition-colors"
-                >
-                  View Services
-                </button>
-              </>
-            ) : (
               <button
                 variant="default"
                 size="lg"
@@ -185,7 +163,6 @@ const About = () => {
               >
                 Go to Dashboard
               </button>
-            )}
           </div>
         </div>
       </section>
