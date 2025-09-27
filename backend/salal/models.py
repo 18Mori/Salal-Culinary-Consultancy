@@ -2,6 +2,7 @@ import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db import models
 
 class Booking(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
@@ -26,27 +27,27 @@ class Booking(models.Model):
     def __str__(self):
         return f"{self.title} on {self.date} at {self.time} by {self.client.username}"
       
-# class AccountPlan(models.Model):
-#     PLAN_CHOICES = [
-#         ('standard', 'Standard'),
-#         ('basic', 'Basic'),
-#         ('premium', 'Premium'),
-#     ]
-    
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     plan_type = models.CharField(max_length=20, choices=PLAN_CHOICES, default='free')
-#     start_at = models.DateField(auto_now_add=True)
-#     is_active = models.BooleanField(default=True)
-    
-#     def __str__(self):
-#         return f"{self.user.username} - {self.plan_type}"
-    
-#     def upgrade_plan(self, new_plan):
-#         if new_plan in dict(self.PLAN_CHOICES).keys():
-#             self.plan_type = new_plan
-#             self.save()
-    
-#     def cancel_plan(self):
-#         self.is_active = False
-#         self.end_date = timezone.now().date()
-#         self.save()
+      
+      
+class MpesaRequest(models.Model):
+    phone_number = models.CharField(max_length=15)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    account_reference = models.CharField(max_length=50)
+    transaction_desc = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    checkout_request_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.phone_number} - {self.amount}"
+
+class MpesaResponse(models.Model):
+    request = models.OneToOneField(MpesaRequest, on_delete=models.CASCADE)
+    response_code = models.CharField(max_length=10)
+    response_description = models.TextField()
+    customer_message = models.TextField()
+    merchant_request_id = models.CharField(max_length=100)
+    checkout_request_id = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Response for {self.request.phone_number}"
