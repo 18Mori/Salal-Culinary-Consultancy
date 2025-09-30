@@ -301,22 +301,6 @@ function Form({ route, method }) {
                   errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
                 }`}
               />
-              {password && (
-                <div className="mt-2 space-y-1 text-xs text-gray-600">
-                  <span className={passFeedback.length ? 'text-green-600' : 'text-red-500'}>
-                    ✓ At least 8 characters
-                  </span>
-                  <span className={passFeedback.letter ? 'text-green-600' : 'text-red-500'}>
-                    ✓ At least one letter
-                  </span>
-                  <span className={passFeedback.number ? 'text-green-600' : 'text-red-500'}>
-                    ✓ At least one number
-                  </span>
-                  <span className={passFeedback.symbol ? 'text-green-600' : 'text-red-500'}>
-                    ✓ At least one symbol: !@#$
-                  </span>
-                </div>
-              )}
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}

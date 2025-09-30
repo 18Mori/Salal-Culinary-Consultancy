@@ -72,6 +72,7 @@ function DashboardContent({ userData, loading }) {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Bill Page</h1>
+      <p>No invoice</p>
     </div>
 
     

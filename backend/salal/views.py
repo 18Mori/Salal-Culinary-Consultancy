@@ -42,18 +42,15 @@ class BookingView(APIView):
     authentication_classes = [JWTAuthentication]
     
     def get(self, request):
-        user = request.user
-        bookings = Booking.objects.filter(client=user).order_by('-date', '-time')
+        bookings = Booking.objects.filter(client=request.user).order_by('-date', '-time')
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    @api_view(['POST'])
-    @permission_classes([IsAuthenticated])
+    
     def post(self, request):
-        user = request.user
         data = request.data.copy()
-        data['client'] = user.id
+        data['client'] = request.user.id
         
-        serializer = BookingSerializer(data=request.data)
+        serializer = BookingSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
