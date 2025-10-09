@@ -65,6 +65,13 @@ class BookingView(APIView):
         except Booking.DoesNotExist:
             return Response({"error": "Booking not found or access denied"}, status=status.HTTP_404_NOT_FOUND)
         
+class BookingCountView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        count = Booking.objects.filter(client=request.user).count()
+        return Response({'total_bookings': count})
 
 
 class LoginView(APIView):

@@ -72,9 +72,9 @@ function DashboardContent({ loading }) {
             <div className="flex items-center justify-between">
             </div>
           </div>
-          {/* <div>
+          <div>
               <DStats />
-          </div> */}
+          </div>
           <div>
             <BookingList />
           </div>

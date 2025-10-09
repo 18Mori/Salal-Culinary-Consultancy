@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../../../constants";
 
 const DStats = () => {
-  const [totalBookings, setTotalBookings] = useState(0);
-  const [loading, setLoading] = useState(false); // ✅ Added
+  const [total_bookings, setTotalBookings] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const DStats = () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/booking/`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/booking/count/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -57,7 +57,7 @@ const DStats = () => {
           </div>
           <div className="ml-4">
             <h3 className="text-sm font-medium text-gray-500">Total Bookings</h3>
-            <p className="mt-1 text-2xl font-semibold text-gray-900">{totalBookings}</p>
+            <p className="mt-1 text-2xl font-semibold text-gray-900">{total_bookings}</p>
           </div>
         </div>
       </div>
