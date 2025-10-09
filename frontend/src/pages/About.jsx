@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import HomeNav from "../components/homeNav";
+import { ACCESS_TOKEN } from '../constants';
 
 
 const About = () => {
   const navigate = useNavigate();
-  const isAuthenticated = !!localStorage.getItem('accessToken');
+  const isAuthenticated = !!localStorage.getItem(ACCESS_TOKEN);
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,14 +156,25 @@ const About = () => {
             Schedule a free consultation today and discover how our expertise can elevate your operation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {isAuthenticated ? (
               <button
                 variant="default"
                 size="lg"
                 onClick={() => navigate('/client_index')}
-                className="px-8 py-3 bg-white text-primary hover:bg-gray-100 transition-colors"
+                className="px-8 py-3 bg-white text-primary hover:bg-gray-100 border-b-2 transition-colors"
               >
                 Go to Dashboard
               </button>
+            ) : (
+              <button
+                variant="default"
+                size="lg"
+                onClick={() => navigate('/login')}
+                className="px-8 py-3 bg-white text-primary hover:bg-gray-500 border-b-2 transition-colors"
+              >
+                Login to Get Started
+              </button>
+            )}
           </div>
         </div>
       </section>

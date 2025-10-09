@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
+import { ACCESS_TOKEN } from "../../../../constants";
 import DNavigation from "../../../ClientDashboard/components/DNavigation";
 import BookingForm from "../../../../components/BookingForm";
 import BookingList from "./BookingList";
+import LoadingIndicator from "../../../../components/LoadingIndicator";
 
 
 
 function Booking() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => {
@@ -24,7 +25,7 @@ function Booking() {
 
   useEffect(() => {
     setLoading(true);
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       fetch("/api/user", {
         headers: {
@@ -55,7 +56,6 @@ function Booking() {
       />
       <main className={`${sidebarCollapsed ? 'ml-16' : 'ml-64'} p-4 transition-all duration-300`}>
         <DashboardContent 
-          userData={userData} 
           loading={loading} 
         />
       </main>
@@ -64,7 +64,7 @@ function Booking() {
     );
 }
 
-function DashboardContent({ userData, loading }) {
+function DashboardContent({ loading }) {
   if (loading) {
     return <LoadingIndicator />;
   }

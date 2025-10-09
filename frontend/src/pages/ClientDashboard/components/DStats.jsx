@@ -4,6 +4,8 @@ import { ACCESS_TOKEN } from "../../../constants";
 
 const DStats = () => {
   const [totalBookings, setTotalBookings] = useState(0);
+  const [loading, setLoading] = useState(false); // ✅ Added
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchBookingCount();
@@ -39,6 +41,10 @@ const DStats = () => {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <div>Loading stats...</div>;
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-20">

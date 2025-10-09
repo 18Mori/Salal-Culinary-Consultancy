@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ACCESS_TOKEN } from "../../constants";
 import DNavigation from "./components/DNavigation";
 import LoadingIndicator from "../../components/LoadingIndicator";
 import DStats from "./components/DStats";
@@ -8,7 +9,6 @@ import BookingList from "./components/page/BookingList";
 function client_index() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
 const toggleSidebar = () => {
@@ -25,7 +25,7 @@ const toggleSidebar = () => {
   useEffect(() => {
     setLoading(true);
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/";
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       fetch(`${apiUrl}/api/user/`, {
         headers: {
@@ -55,7 +55,6 @@ const toggleSidebar = () => {
       />
       <main className={`${sidebarCollapsed ? 'ml-16' : 'ml-64'} p-4 transition-all duration-300`}>
         <DashboardContent 
-          userData={userData} 
           loading={loading} 
         />
       </main>
@@ -63,7 +62,7 @@ const toggleSidebar = () => {
   );
 }
 
-function DashboardContent({ userData, loading }) {
+function DashboardContent({ loading }) {
   if (loading) {
     return <LoadingIndicator />;
   }

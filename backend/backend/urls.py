@@ -9,6 +9,5 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='get_token'),
     path("api-auth/", include("rest_framework.urls")),
     path("api/", include("salal.urls")),
-    # path('api/user/', User.as_view(), name='user')
     # path('mpesa/', include('stkpush.urls')),
 ]

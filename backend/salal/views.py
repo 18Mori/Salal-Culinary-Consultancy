@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from .serializers import *
 from .models import *
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -100,7 +101,6 @@ class LoginView(APIView):
             'user': {
                 'id': user.id,
                 'username': user.username,
-                'password': user.password,
             }
         }, status=status.HTTP_200_OK)
         
@@ -123,8 +123,15 @@ class RegisterView(APIView):
                     'lastname': user.last_name,
                     'email': user.email,
                     'username': user.username,
-                    'password': user.password,
                 }
             }, status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def user_detail(request):
+    return Response({
+        'id': request.user.id,
+        'username': request.user.username,
+        'email': request.user.email,
+    })
