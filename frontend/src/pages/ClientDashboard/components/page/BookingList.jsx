@@ -61,7 +61,7 @@ const BookingList = () => {
 
     const token = localStorage.getItem(ACCESS_TOKEN);
     const apiUrl = import.meta.env.VITE_API_URL;
-    const endpoint = `${apiUrl}/api/bookings/${deleteBookingId}/`;
+    const endpoint = `${apiUrl}/api/booking/${deleteBookingId}/`;
     try {
       const res = await fetch(endpoint, {
         method: "DELETE",

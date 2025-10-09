@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
+import { Link } from 'react-router-dom';
 import LoadingIndicator from './LoadingIndicator';
 
 function Form({ route, method }) {
@@ -80,7 +81,7 @@ function Form({ route, method }) {
         length: password.length >= 8,
         letter: /[A-Za-z]/.test(password),
         number: /\d/.test(password),
-        symbol: /[!@#$%]/.test(password),
+        symbol: /[^A-Za-z0-9]/.test(password),
       };
 
       const passwordErrors = {};
@@ -151,7 +152,6 @@ function Form({ route, method }) {
       // Save tokens and redirect
       localStorage.setItem(ACCESS_TOKEN, data.access);
       localStorage.setItem(REFRESH_TOKEN, data.refresh);
-      localStorage.setItem('user', JSON.stringify(data.user));
 
       if (data.user) {
         navigate('/client_index');
@@ -274,7 +274,7 @@ function Form({ route, method }) {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Choose a username"
+                placeholder="Username"
                 autoComplete="username"
                 autoFocus
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
@@ -295,7 +295,7 @@ function Form({ route, method }) {
                 type="password"
                 value={password}
                 onChange={handlePasswordChange}
-                placeholder="Create a strong password"
+                placeholder="Password"
                 autoComplete="new-password"
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
                   errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
@@ -363,20 +363,21 @@ function Form({ route, method }) {
             {method === 'login' ? (
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
                   Register
-                </a>
+                </Link>
               </p>
             ) : (
               <p className="text-sm text-gray-600">
                 Already have an account?{' '}
-                <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                  Login
-                </a>
+                <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+                      Login
+                    </Link>
               </p>
             )}
             <p className="mt-2 text-sm text-gray-500">
-              <a href="/" className="hover:text-gray-700">← Back to Home</a>
+              <Link to="/" className="hover:text-gray-700">← Back to Home
+              </Link>
             </p>
           </div>
         </div>

@@ -23,6 +23,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         raise serializers.ValidationError({'password_confirm': "Passwords do not match"})
       
       if User.objects.filter(username=attrs['username']).exists():
+        raise serializers.ValidationError({'username': "This username is already taken."})
+      
+      if User.objects.filter(email=attrs['email']).exists():
         raise serializers.ValidationError({'email': "This email is already registered."})
       
       return attrs
@@ -34,20 +37,22 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password must contain at least one letter")
         if not re.search(r'\d', value):
             raise serializers.ValidationError("Password must contain at least one number")
-        if not re.search(r'[!@#$%]', value):
-            raise serializers.ValidationError("Password must contain at least one symbol: !@#$%")
+        if not re.search(r'[^A-Za-z0-9]', value):
+            raise serializers.ValidationError("Password must contain at least one special character.")
         return value
     
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
             password=validated_data['password'],
         )
         return user
 
 class BookingSerializer(serializers.ModelSerializer):
-    client_username = serializers.CharField(source='client.get.username', read_only=True)
+    client_username = serializers.CharField(source='client.username', read_only=True)
     
     class Meta:
         model = Booking

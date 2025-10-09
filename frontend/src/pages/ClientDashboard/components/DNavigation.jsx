@@ -25,9 +25,9 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
     <nav className={`fixed left-0 top-0 h-screen z-50 transition-all duration-300 flex flex-col bg-white shadow-lg ${
       isCollapsed ? 'w-16' : 'w-60'
     }`}>
-      <div className="flex items-center justify-between p-4 mx-auto border-b border-gray-200">
+      <div className="flex items-center justify-between pt-4 pb-4 border-b border-gray-200">
         {!isCollapsed ? (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 mx-auto">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <img src="chef-hat.png" alt="Chef Hat" className="w-full h-full object-contain" />
             </div>
@@ -41,7 +41,7 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
             </div>
           </div>
         ) : (
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center mx-auto">
             <img src="chef-hat.png" alt="Chef Hat" className="w-full h-full object-contain" />
           </div>
         )}

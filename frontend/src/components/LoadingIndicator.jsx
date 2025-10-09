@@ -1,4 +1,3 @@
-// src/components/LoadingIndicator.jsx
 import React from "react";
 
 const LoadingIndicator = ({ size = "md" }) => {
@@ -9,7 +8,8 @@ const LoadingIndicator = ({ size = "md" }) => {
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div 
+    aria-live="polite" className="flex items-center justify-center">
       <svg
         className={`${sizes[size]} animate-spin text-slate-600`}
         xmlns="http://www.w3.org/2000/svg"

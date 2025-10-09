@@ -24,6 +24,12 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:8000').split(',')
 
+
+# MPESA_CONSUMER_KEY = os.getenv('MPESA_CONSUMER_KEY')
+# MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET')
+# MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE')
+# MPESA_PASSKEY = os.getenv('MPESA_PASSKEY')
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -140,18 +146,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8000",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
 
 USE_TZ = True
 TIME_ZONE = 'UTC'
-
-
-# from decouple import config
-
-# MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY')
-# MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET')
-# MPESA_SHORTCODE = config('MPESA_SHORTCODE')
-# MPESA_PASSKEY = config('MPESA_PASSKEY')
