@@ -108,7 +108,10 @@ class LoginView(APIView):
             'user': {
                 'id': user.id,
                 'username': user.username,
-            }
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email, 
+                    }
         }, status=status.HTTP_200_OK)
         
         
@@ -136,9 +139,11 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def user_detail(request):
     return Response({
         'id': request.user.id,
-        'username': request.user.username,
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name, 
         'email': request.user.email,
     })

@@ -170,7 +170,7 @@ const About = () => {
                 variant="default"
                 size="lg"
                 onClick={() => navigate('/login')}
-                className="px-8 py-3 bg-white text-primary hover:bg-gray-500 border-b-2 transition-colors"
+                className="px-8 py-3 bg-white text-primary hover:bg-gray-100 border-b-2 transition-colors"
               >
                 Login to Get Started
               </button>

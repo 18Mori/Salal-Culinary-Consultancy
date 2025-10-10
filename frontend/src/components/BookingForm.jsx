@@ -265,7 +265,7 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
           <textarea
             value={formData.notes}
             onChange={(e) => handleInputChange('notes', e.target.value)}
-            placeholder="Any specific topics, materials needed, or preparation requirements..."
+            placeholder="(Optional) Any specific topics, materials needed, or preparation requirements..."
             rows={3}
             className="w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring resize-none"
           />
