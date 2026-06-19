@@ -2,6 +2,9 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    path('admin/bookings/', AdminBookingsView.as_view(), name='admin-bookings'),
+    path('admin/clients/', AdminClientsView.as_view(), name='admin-clients'),
+    path('admin/clients/<int:user_id>/', AdminDeleteClientView.as_view(), name='admin-delete-client'),
     path('user/', user_detail, name='user-detail'),
     path('auth/login/', LoginView.as_view(), name='login'),
     path('auth/register/', RegisterView.as_view(), name='register'),

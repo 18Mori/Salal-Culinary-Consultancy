@@ -1,8 +1,20 @@
 import datetime
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-from django.db import models
+
+
+class User(AbstractUser):
+    ROLE_CHOICES = [
+        ('client', 'Client'),
+        ('admin', 'Admin'),
+    ]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='client')
+
+    def is_admin(self):
+        return self.role == 'admin'
+
 
 class Booking(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')

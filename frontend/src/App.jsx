@@ -18,6 +18,7 @@ const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/login/Login"));
 const Register = lazy(() => import("./pages/register/Register"));
 const About = lazy(() => import("./pages/About"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
 
 function MainLayout({ children }) {
@@ -34,6 +35,16 @@ function App() {
     <BrowserRouter>
     
       <Routes>
+        <Route
+  path="/AdminDashboard"
+  element={
+    <MainLayout>
+      <ProtectedRoute>
+        <AdminDashboard />
+      </ProtectedRoute>
+    </MainLayout>
+  }
+/>
       <Route
           path="/client_index"
           element={

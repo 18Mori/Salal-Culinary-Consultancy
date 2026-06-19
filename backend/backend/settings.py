@@ -153,3 +153,5 @@ CORS_ALLOW_CREDENTIALS = True
 
 USE_TZ = True
 TIME_ZONE = 'UTC'
+
+AUTH_USER_MODEL = 'salal.User'

@@ -2,18 +2,74 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from .serializers import *
 from .models import *
+from rest_framework.permissions import AllowAny,IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
 import logging
 logger = logging.getLogger(__name__)
 
+
+
+class AdminClientsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        clients = User.objects.filter(is_staff=False).order_by('-date_joined')
+        data = []
+        for client in clients:
+            data.append({
+                'id': client.id,
+                'username': client.username,
+                'email': client.email,
+                'first_name': client.first_name,
+                'last_name': client.last_name,
+                'date_joined': client.date_joined,
+                'last_login': client.last_login,
+            })
+        return Response(data)
+
+class AdminBookingsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        bookings = Booking.objects.select_related('client').order_by('-created_at')
+        data = []
+        for booking in bookings:
+            data.append({
+                'id': booking.id,
+                'client_username': booking.client.username,
+                'client_email': booking.client.email,
+                'booking_title': booking.title,
+                'service_type': booking.service_type,
+                'date': booking.date,
+                'time': booking.time,
+                'created_at': booking.created_at,
+                'session_type': booking.get_session_type_display(),
+            })
+        return Response(data)
+    
+    #  Delete a client and their bookings
+class AdminDeleteClientView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def delete(self, request, user_id):
+        if user_id == request.user.id:
+            return Response(
+                {"error": "Cannot delete your own account"},
+                status=400
+            )
+        try:
+            user = User.objects.get(id=user_id)
+            user.delete()  # Cascades to delete booking
+            return Response({"message": "Client deleted"}, status=204)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
 
 
 class ClientDashboardView(APIView):

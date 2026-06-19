@@ -74,6 +74,11 @@ const HomeNav = () => {
             Login
           </Link>
         )}
+        {isAuthenticated && (
+  <Link to="/admin-dashboard" className="ml-4">
+    Admin Dashboard
+  </Link>
+)}
         </div>
       </div>
       </nav>

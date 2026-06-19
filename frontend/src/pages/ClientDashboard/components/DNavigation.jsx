@@ -74,7 +74,7 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <img src="chef-hat.png" alt="Chef Hat" className="w-full h-full object-contain" />
             </div>
-            <div className="flex flex-col">
+            <div className="cursor-default flex flex-col">
               <span className="font-heading font-semibold text-lg text-foreground leading-tight">
                 Salal Culinary
               </span>
@@ -168,7 +168,7 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
 <div className="p-4 border-t border-gray-200">
   {!isCollapsed ? (
     <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="cursor-default flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 font-medium">
                 {userInitials}
               </div>
@@ -193,7 +193,7 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
           </div>
         ) : (
           <div className="flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 font-medium">
+            <div className=" cursor-default w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 font-medium">
               {userInitials}
             </div>
           </div>
