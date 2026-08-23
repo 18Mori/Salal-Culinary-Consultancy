@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../constants';
-import LoadingIndicator from './LoadingIndicator';
+
 
 const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
   const navigate = useNavigate();
@@ -325,7 +325,6 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
           >
             {isSubmitting ? (
               <>
-                <LoadingIndicator size="sm" />
                 Booking...
               </>
             ) : (

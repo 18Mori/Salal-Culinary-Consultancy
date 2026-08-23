@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import DNavigation from "../DNavigation";
+import SkeletonLoader from "../../../../components/SkeletonLoader";
 
 function Bill() {
   const [logout, setLogout] = useState(false);
@@ -67,7 +68,7 @@ function Bill() {
 
 function DashboardContent({ userData, loading }) {
   if (loading) {
-    return <LoadingIndicator />;
+    return <SkeletonLoader.Section />;
   }
   return (
     <div className="container mx-auto p-4">

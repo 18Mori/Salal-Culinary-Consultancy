@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
 import { Link } from 'react-router-dom';
-import LoadingIndicator from './LoadingIndicator';
+
 
 function Form({ route, method }) {
   const navigate = useNavigate();
@@ -138,14 +138,26 @@ function Form({ route, method }) {
 
       // Handle server-side errors
       if (!res.ok) {
-        if (data.username) setErrors((prev) => ({ ...prev, username: data.username[0] }));
-        if (data.email) setErrors((prev) => ({ ...prev, email: data.email[0] }));
-        if (data.first_name) setErrors((prev) => ({ ...prev, firstName: data.first_name[0] }));
-        if (data.last_name) setErrors((prev) => ({ ...prev, lastName: data.last_name[0] }));
-        if (data.password) setErrors((prev) => ({ ...prev, password: data.password[0] }));
-        if (data.password_confirm) setErrors((prev) => ({ ...prev, passwordConfirm: data.password_confirm[0] }));
-        if (data.non_field_errors) setErrors((prev) => ({ ...prev, general: data.non_field_errors[0] }));
-        else setErrors((prev) => ({ ...prev, general: 'Registration/Login failed. Please try again.' }));
+        const newErrors = {};
+        if (data.username) newErrors.username = Array.isArray(data.username) ? data.username[0] : data.username;
+        if (data.email) newErrors.email = Array.isArray(data.email) ? data.email[0] : data.email;
+        if (data.first_name) newErrors.firstName = Array.isArray(data.first_name) ? data.first_name[0] : data.first_name;
+        if (data.last_name) newErrors.lastName = Array.isArray(data.last_name) ? data.last_name[0] : data.last_name;
+        if (data.password) newErrors.password = Array.isArray(data.password) ? data.password[0] : data.password;
+        if (data.password_confirm) newErrors.passwordConfirm = Array.isArray(data.password_confirm) ? data.password_confirm[0] : data.password_confirm;
+        if (data.non_field_errors) newErrors.general = Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors;
+        if (data.detail) newErrors.general = data.detail;
+
+        if (Object.keys(newErrors).length === 0) {
+          const firstKey = Object.keys(data)[0];
+          if (firstKey && data[firstKey]) {
+            const errVal = data[firstKey];
+            newErrors.general = Array.isArray(errVal) ? errVal[0] : errVal;
+          } else {
+            newErrors.general = 'Registration/Login failed. Please try again.';
+          }
+        }
+        setErrors(newErrors);
         return;
       }
 
@@ -177,17 +189,19 @@ function Form({ route, method }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-charcoal py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-cream rounded-xl shadow-lg border border-sage-200 p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <img src="chef-hat.png" alt="Chef Hat" className="w-14 h-14" />
+            <div className="w-16 h-10 bg-terracotta/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-terracotta" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8 4-8-4-5 15 5 15L4 21l8 4 8-4 5-15-5-15Z" />
+              </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-charcoal mb-2">
               {method === 'login' ? 'Welcome Back' : 'Create Your Account'}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {method === 'login'
                 ? 'Sign in to access your culinary consultancy portal'
                 : 'Join Salal Culinary Consultancy to access expert guidance and resources'}
@@ -195,7 +209,7 @@ function Form({ route, method }) {
           </div>
 
           {errors.general && (
-            <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            <div className="mb-6 p-3 bg-charcoal/10 border border-charcoal/20 text-charcoal/20 rounded-lg text-sm">
               {errors.general}
             </div>
           )}
@@ -204,7 +218,7 @@ function Form({ route, method }) {
             {method === 'register' && (
               <>
                 <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="firstName" className="block text-sm font-medium text-charcoal mb-1">
                     First Name
                   </label>
                   <input
@@ -214,17 +228,17 @@ function Form({ route, method }) {
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Enter your first name"
                     autoComplete="given-name"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                      errors.firstName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
+                    className={`w-full px-4 py-3 border border-sage-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition ${
+                      errors.firstName ? 'border-charcoal' : 'focus:ring-charcoal'
                     }`}
                   />
                   {errors.firstName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                    <p className="mt-1 text-sm text-charcoal">{errors.firstName}</p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="lastName" className="block text-sm font-medium text-charcoal mb-1">
                     Last Name
                   </label>
                   <input
@@ -234,17 +248,17 @@ function Form({ route, method }) {
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Enter your last name"
                     autoComplete="family-name"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                      errors.lastName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
+                    className={`w-full px-4 py-3 border border-sage-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition ${
+                      errors.lastName ? 'border-charcoal' : 'focus:ring-charcoal'
                     }`}
                   />
                   {errors.lastName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                    <p className="mt-1 text-sm text-charcoal">{errors.lastName}</p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-charcoal mb-1">
                     Email
                   </label>
                   <input
@@ -254,91 +268,131 @@ function Form({ route, method }) {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     autoComplete="email"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                      errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
+                    className={`w-full px-4 py-3 border border-sage-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition ${
+                      errors.email ? 'border-charcoal' : 'focus:ring-charcoal'
                     }`}
                   />
                   {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                    <p className="mt-1 text-sm text-charcoal">{errors.email}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="username" className="block text-sm font-medium text-charcoal mb-1">
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Username"
+                    autoComplete="username"
+                    autoFocus
+                    className={`w-full px-4 py-3 border border-sage-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition ${
+                      errors.username ? 'border-charcoal' : 'focus:ring-charcoal'
+                    }`}
+                  />
+                  {errors.username && (
+                    <p className="mt-1 text-sm text-charcoal">{errors.username}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-charcoal mb-1">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    placeholder="Password"
+                    autoComplete="new-password"
+                    className={`w-full px-4 py-3 border border-sage-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition ${
+                      errors.password ? 'border-charcoal' : 'focus:ring-charcoal'
+                    }`}
+                  />
+                  {errors.password && (
+                    <p className="mt-1 text-sm text-charcoal">{errors.password}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="passwordConfirm" className="block text-sm font-medium text-charcoal mb-1">
+                    Confirm Password
+                  </label>
+                  <input
+                    id="passwordConfirm"
+                    type="password"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    placeholder="Confirm your password"
+                    autoComplete="new-password"
+                    className={`w-full px-4 py-3 border border-sage-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition ${
+                      errors.passwordConfirm ? 'border-charcoal' : 'focus:ring-charcoal'
+                    }`}
+                  />
+                  {errors.passwordConfirm && (
+                    <p className="mt-1 text-sm text-charcoal">{errors.passwordConfirm}</p>
                   )}
                 </div>
               </>
             )}
 
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Username
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                autoComplete="username"
-                autoFocus
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                  errors.username ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
-                }`}
-              />
-              {errors.username && (
-                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-              )}
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={handlePasswordChange}
-                placeholder="Password"
-                autoComplete="new-password"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                  errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
-                }`}
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-              )}
-            </div>
 
-            {method === 'register' && (
-              <div>
-                <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700 mb-1">
-                  Confirm Password
-                </label>
-                <input
-                  id="passwordConfirm"
-                  type="password"
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  placeholder="Confirm your password"
-                  autoComplete="new-password"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                    errors.passwordConfirm ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
-                  }`}
-                />
-                {errors.passwordConfirm && (
-                  <p className="mt-1 text-sm text-red-600">{errors.passwordConfirm}</p>
-                )}
-              </div>
+            {method === 'login' && (
+              <>
+                <div>
+                  <label htmlFor="username" className="block text-sm font-medium text-charcoal mb-1">
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Username"
+                    autoComplete="username"
+                    autoFocus
+                    className={`w-full px-4 py-3 border border-sage-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition ${
+                      errors.username ? 'border-charcoal' : 'focus:ring-charcoal'
+                    }`}
+                  />
+                  {errors.username && (
+                    <p className="mt-1 text-sm text-charcoal">{errors.username}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-charcoal mb-1">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    placeholder="Password"
+                    autoComplete="current-password"
+                    className={`w-full px-4 py-3 border border-sage-300 rounded-lg focus:ring-2 focus:ring-brass focus:border-transparent transition ${
+                      errors.password ? 'border-charcoal' : 'focus:ring-charcoal'
+                    }`}
+                  />
+                  {errors.password && (
+                    <p className="mt-1 text-sm text-charcoal">{errors.password}</p>
+                  )}
+                </div>
+              </>
             )}
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-brass text-charcoal py-3 px-4 rounded-lg font-medium hover:bg-sage-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 " fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
                   {name}...
                 </>
               ) : (
@@ -349,7 +403,6 @@ function Form({ route, method }) {
                     viewBox="0 -960 960 960"
                     width="24"
                     fill="currentColor"
-                    className="w-5 h-5"
                   >
                     <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z" />
                   </svg>
@@ -361,22 +414,22 @@ function Form({ route, method }) {
 
           <div className="mt-6 text-center">
             {method === 'login' ? (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-sage-500">
                 Don't have an account?{' '}
-                <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link to="/register" className="font-medium text-brass hover:text-terracotta">
                   Register
                 </Link>
               </p>
             ) : (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-sage-500">
                 Already have an account?{' '}
-                <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link to="/login" className="font-medium text-brass hover:text-terracotta">
                       Login
                     </Link>
               </p>
             )}
-            <p className="mt-2 text-sm text-gray-500">
-              <Link to="/" className="hover:text-gray-700">← Back to Home
+            <p className="mt-2 text-sm text-sage-400">
+              <Link to="/" className="hover:text-charcoal">← Back to Home
               </Link>
             </p>
           </div>

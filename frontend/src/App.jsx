@@ -5,12 +5,14 @@ import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Booking from "./pages/ClientDashboard/components/page/Booking"
 import Bill from "./pages/ClientDashboard/components/page/Bill"
-import LoadingIndicator from "./components/LoadingIndicator"
+import SkeletonLoader from "./components/SkeletonLoader";
 import { Suspense, lazy } from "react";
 
 
 function Logout() {
-  localStorage.clear();
+  localStorage.removeItem('access');
+  localStorage.removeItem('refresh');
+  localStorage.removeItem('sidebarCollapsed');
   window.location.href = '/login';
   return <div style={{ textAlign: 'center', padding: '50px' }}>Logging out...</div>;
 }
@@ -19,6 +21,8 @@ const Login = lazy(() => import("./pages/login/Login"));
 const Register = lazy(() => import("./pages/register/Register"));
 const About = lazy(() => import("./pages/About"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Services = lazy(() => import("./pages/Services"));
+const Portfolio = lazy(() => import("./pages/Portfolio"));
 
 
 function MainLayout({ children }) {
@@ -37,6 +41,26 @@ function App() {
       <Routes>
         <Route
   path="/AdminDashboard"
+  element={
+    <MainLayout>
+      <ProtectedRoute>
+        <AdminDashboard />
+      </ProtectedRoute>
+    </MainLayout>
+  }
+/>
+        <Route
+  path="/admin-dashboard"
+  element={
+    <MainLayout>
+      <ProtectedRoute>
+        <AdminDashboard />
+      </ProtectedRoute>
+    </MainLayout>
+  }
+/>
+        <Route
+  path="/admin/dashboard"
   element={
     <MainLayout>
       <ProtectedRoute>
@@ -78,7 +102,7 @@ function App() {
         <Route
           path="/"
           element={
-            <Suspense fallback={<LoadingIndicator />}>
+            <Suspense fallback={<SkeletonLoader.Section />}>
               <MainLayout>
                 <Home />
               </MainLayout>
@@ -86,22 +110,32 @@ function App() {
           }
         />
         <Route path="/about" element={
-          <Suspense fallback={<LoadingIndicator />}>
+          <Suspense fallback={<SkeletonLoader.Section />}>
             <MainLayout><About /></MainLayout>
           </Suspense>
           } />
+        <Route path="/services" element={
+          <Suspense fallback={<SkeletonLoader.Section />}>
+            <MainLayout><Services /></MainLayout>
+          </Suspense>
+          } />
+        <Route path="/portfolio" element={
+          <Suspense fallback={<SkeletonLoader.Section />}>
+            <MainLayout><Portfolio /></MainLayout>
+          </Suspense>
+          } />
         <Route path="/login" element={
-          <Suspense fallback={<LoadingIndicator />}>
+          <Suspense fallback={<SkeletonLoader.Section />}>
           <MainLayout><Login /></MainLayout>
           </Suspense>
           } />
         <Route path="/logout" element={
-          <Suspense fallback={<LoadingIndicator />}>
+          <Suspense fallback={<SkeletonLoader.Section />}>
           <MainLayout><Logout /></MainLayout>
           </Suspense>
           } />
         <Route path="/register" element={
-          <Suspense fallback={<LoadingIndicator />}>
+          <Suspense fallback={<SkeletonLoader.Section />}>
           <MainLayout><Register /></MainLayout>
           </Suspense>
           } />

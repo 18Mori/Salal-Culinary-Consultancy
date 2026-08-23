@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../../../constants';
 
-const DNavigation = ({ onToggleCollapse, setLogout }) => {
+const DNavigation = ({ onToggleCollapse }) => {
   const location = useLocation();
 
   const [fullName, setFullName] = useState('');
@@ -10,42 +10,40 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
   const [userInitials, setUserInitials] = useState('');
 
   useEffect(() => {
-  const fetchUserDetails = async () => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    if (!token) {
-      setLoadingUser(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (res.ok) {
-        const user = await res.json();
-        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-        setFullName(fullName || user.email || 'User Account');
-        const email = `${user.email}`
-        setEmail(email || 'User Email');
-
-        const initials = 
-          (user.first_name?.charAt(0) || '') + 
-          (user.last_name?.charAt(0) || '');
-        setUserInitials(initials || 'U');
-      } else if (res.status === 401) {
-        localStorage.removeItem(ACCESS_TOKEN);
-        window.location.href = '/login';
+    const fetchUserDetails = async () => {
+      const token = localStorage.getItem(ACCESS_TOKEN);
+      if (!token) {
+        setFullName('');
+        setEmail('');
+        setUserInitials('');
+        return;
       }
-      } catch (error) {
-      console.error('Failed to fetch user details:', error);
-    } finally {
-      setLoadingUser(false);
-    }
-  };
 
-  fetchUserDetails();
-}, []);
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+          const user = await res.json();
+          const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+          setFullName(fullName || user.email || 'User Account');
+          setEmail(user.email || '');
+
+          const initials = 
+            (user.first_name?.charAt(0) || '') + 
+            (user.last_name?.charAt(0) || '');
+          setUserInitials(initials || 'U');
+        } else if (res.status === 401) {
+          localStorage.removeItem(ACCESS_TOKEN);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user details:', error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebarCollapsed');
@@ -65,7 +63,7 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
   };
 
   return (
-    <nav className={`fixed left-0 top-0 h-screen z-50 transition-all duration-300 flex flex-col bg-white shadow-lg ${
+    <nav className={`fixed left-0 top-0 h-screen z-50 flex flex-col bg-white shadow-lg transition-all duration-300 ease-out ${
       isCollapsed ? 'w-16' : 'w-60'
     }`}>
       <div className="flex items-center justify-between pt-4 pb-4 border-b border-gray-200">
@@ -137,20 +135,6 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
         </Link>
 
         <Link
-          to="/booking"
-          className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
-            isActive('/booking')
-              ? 'bg-primary text-white shadow-md'
-              : 'text-gray-700 hover:bg-gray-100'
-          }`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
-            <path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h480q33 0 56.5 23.5T800-800v640q0 33-23.5 56.5T720-80H240Zm0-80h480v-640h-80v280l-100-60-100 60v-280H240v640Zm0 0v-640 640Zm200-360 100-60 100 60-100-60-100 60Z" />
-          </svg>
-          {!isCollapsed && <span className="ml-3">Booking</span>}
-        </Link>
-
-        <Link
           to="/bill"
           className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
             isActive('/bill')
@@ -163,42 +147,57 @@ const DNavigation = ({ onToggleCollapse, setLogout }) => {
           </svg>
           {!isCollapsed && <span className="ml-3">Bills</span>}
         </Link>
+
+        <Link
+          to="/services"
+          className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
+            isActive('/services')
+              ? 'bg-primary text-white shadow-md'
+              : 'text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+            <path d="M480-80q-139-35-229.5-147T160-504v-256l320-120 320 120v256q0 125-90.5 237T480-80Zm0-84q104-33 172-132t68-224v-210l-240-90-240 90v210q0 125 68 224t172 132Zm0-316Z" />
+          </svg>
+          {!isCollapsed && <span className="ml-3">Services</span>}
+        </Link>
+
+        <Link
+          to="/logout"
+          className="flex items-center px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/>
+          </svg>
+          {!isCollapsed && <span className="ml-3">Logout</span>}
+        </Link>
       </div>
       {/* Footer for User Info */}
-<div className="p-4 border-t border-gray-200">
-  {!isCollapsed ? (
-    <div className="flex items-center justify-between">
+      <div className="p-4 border-t border-gray-200">
+        {isCollapsed ? (
+          <div className="flex items-center justify-center">
+            <div className=" cursor-default w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 font-medium">
+              {userInitials}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
             <div className="cursor-default flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 font-medium">
                 {userInitials}
               </div>
               <div>
                 <span className="flex text-lg font-medium text-gray-700">
-                {fullName || 'User Account'}
-              </span>
-              <span className="text-xs font-medium text-gray-600">
-                {email}
-              </span>
+                  {fullName || 'User Account'}
+                </span>
+                <span className="text-xs font-medium text-gray-600">
+                  {email}
+                </span>
               </div>
             </div>
-            <button
-              className="bg-slate-500 hover:bg-red-500 text-white p-1 rounded-r-3xl transition-colors"
-              onClick={() => setLogout(true)}
-              aria-label="Logout"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
-                <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/>
-              </svg>
-            </button>
           </div>
-        ) : (
-          <div className="flex items-center justify-center">
-            <div className=" cursor-default w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 font-medium">
-              {userInitials}
-            </div>
-          </div>
-  )}
-</div>
+        )}
+      </div>
     </nav>
   );
 };

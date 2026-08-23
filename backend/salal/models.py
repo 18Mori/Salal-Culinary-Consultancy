@@ -29,6 +29,20 @@ class Booking(models.Model):
         ('in-person', 'In-Person'),
         ('phone', 'Phone Call'),
     ])
+    CHEFS = [
+        ('Chef Alex Salal', 'Chef Alex Salal'),
+        ('Chef Marcus Vance', 'Chef Marcus Vance'),
+        ('Chef Elena Rostova', 'Chef Elena Rostova'),
+        ('Chef David Chen', 'Chef David Chen'),
+    ]
+    STATUS_CHOICES = [
+        ('New', 'New'),
+        ('Assigned', 'Assigned'),
+        ('Resolved', 'Resolved'),
+    ]
+    assigned_chef = models.CharField(max_length=100, choices=CHEFS, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

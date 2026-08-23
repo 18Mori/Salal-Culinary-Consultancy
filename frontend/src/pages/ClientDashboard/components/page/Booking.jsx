@@ -1,24 +1,23 @@
 import { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../../../../constants";
-import DNavigation from "../../../ClientDashboard/components/DNavigation";
+import DNavigation from "../DNavigation";
 import BookingForm from "../../../../components/BookingForm";
 import BookingList from "./BookingList";
-import LoadingIndicator from "../../../../components/LoadingIndicator";
-
+import SkeletonLoader from "../../../../components/SkeletonLoader";
 
 
 function Booking() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => {
-  setSidebarCollapsed(!sidebarCollapsed);
-};
+  };
 
   useEffect(() => {
     if (logout) {
-      localStorage.clear();
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
+      localStorage.removeItem('sidebarCollapsed');
       window.location.href = "/login";
     }
   }, [logout]);
@@ -46,27 +45,22 @@ function Booking() {
     }
   }, []);
 
-    return (
-        <>
-          <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       <DNavigation 
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={toggleSidebar}
+        onToggleCollapse={() => {}} 
         setLogout={setLogout} 
       />
-      <main className={`${sidebarCollapsed ? 'ml-16' : 'ml-64'} p-4 transition-all duration-300`}>
-        <DashboardContent 
-          loading={loading} 
-        />
+      <main className="p-4 transition-all duration-300">
+        <DashboardContent loading={loading} />
       </main>
     </div>
-        </>
-    );
+  );
 }
 
 function DashboardContent({ loading }) {
   if (loading) {
-    return <LoadingIndicator />;
+    return <SkeletonLoader.Section />;
   }
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
@@ -74,8 +68,7 @@ function DashboardContent({ loading }) {
       <BookingList />
     </div>
 
-    
   );
-};
+}
 
 export default Booking;
