@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../../../constants';
 
-const DNavigation = ({ onToggleCollapse }) => {
+const AdminNavigation = ({ onToggleCollapse }) => {
   const location = useLocation();
 
   const [fullName, setFullName] = useState('');
@@ -114,9 +114,9 @@ const DNavigation = ({ onToggleCollapse }) => {
       <div className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
 
         <Link
-          to="/client_dashboard"
+          to="/admin-dashboard"
           className={`flex items-center px-3 py-3 rounded-r-xl border-l-4 transition-all duration-200 ${
-            isActive('/client_dashboard') || isActive('/client_index')
+            isActive('/admin-dashboard')
               ? 'bg-charcoal text-brass border-brass shadow-md font-bold scale-[1.02] translate-x-1'
               : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-charcoal'
           }`}
@@ -127,32 +127,11 @@ const DNavigation = ({ onToggleCollapse }) => {
             viewBox="0 -960 960 960" 
             width="24px" 
             fill="currentColor"
-            className={isActive('/client_dashboard') || isActive('/client_index') ? 'text-brass' : 'text-gray-500'}
+            className={isActive('/admin-dashboard') ? 'text-brass' : 'text-gray-500'}
           >
             <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
           </svg>
-          {!isCollapsed && <span className="ml-3 tracking-wide">Dashboard</span>}
-        </Link>
-
-        <Link
-          to="/bill"
-          className={`flex items-center px-3 py-3 rounded-r-xl border-l-4 transition-all duration-200 ${
-            isActive('/bill')
-              ? 'bg-charcoal text-brass border-brass shadow-md font-bold scale-[1.02] translate-x-1'
-              : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-charcoal'
-          }`}
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            height="24px" 
-            viewBox="0 -960 960 960" 
-            width="24px" 
-            fill="currentColor"
-            className={isActive('/bill') ? 'text-brass' : 'text-gray-500'}
-          >
-            <path d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
-          </svg>
-          {!isCollapsed && <span className="ml-3 tracking-wide">Bills</span>}
+          {!isCollapsed && <span className="ml-3 tracking-wide">Admin Dashboard</span>}
         </Link>
 
         <Link
@@ -196,4 +175,4 @@ const DNavigation = ({ onToggleCollapse }) => {
   );
 };
 
-export default DNavigation;
+export default AdminNavigation;

@@ -12,6 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
 import logging
+from typing import cast
 logger = logging.getLogger(__name__)
 
 
@@ -38,7 +39,7 @@ class AdminClientsView(APIView):
                 active_status = "Inactive"
 
             data.append({
-                'id': client.id,
+                'id': client.pk,
                 'username': client.username,
                 'email': client.email,
                 'first_name': client.first_name,
@@ -57,7 +58,7 @@ class AdminBookingsView(APIView):
         data = []
         for booking in bookings:
             data.append({
-                'id': booking.id,
+                'id': booking.pk,
                 'client_username': booking.client.username,
                 'client_email': booking.client.email,
                 'booking_title': booking.title,
@@ -66,7 +67,7 @@ class AdminBookingsView(APIView):
                 'time': booking.time,
                 'notes': booking.notes,
                 'created_at': booking.created_at,
-                'session_type': booking.get_session_type_display(),
+                'session_type': booking.session_type,
                 'assigned_chef': booking.assigned_chef,
                 'status': booking.status,
             })
@@ -86,7 +87,7 @@ class AdminBookingUpdateView(APIView):
                 booking.status = status_val
             booking.save()
             return Response({
-                'id': booking.id,
+                'id': booking.pk,
                 'assigned_chef': booking.assigned_chef,
                 'status': booking.status,
                 'message': 'Booking updated successfully'
@@ -115,6 +116,21 @@ class AdminDeleteClientView(APIView):
 class ClientDashboardView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    def _get_dashboard_stats(self, user):
+        bookings = Booking.objects.filter(client=user)
+        today = timezone.localdate()
+        return {
+            'total_bookings': bookings.count(),
+            'upcoming_bookings': bookings.filter(date__gte=today).count(),
+            'completed_bookings': bookings.filter(date__lt=today).count(),
+        }
+
+    def _get_upcoming_consultations(self, user):
+        return Booking.objects.filter(
+            client=user,
+            date__gte=timezone.localdate(),
+        ).order_by('date', 'time')
 
     def get(self, request):
         user = request.user
@@ -203,7 +219,7 @@ class LoginView(APIView):
                 'access': str(refresh.access_token),
                 'refresh': str(refresh),
                 'user': {
-                    'id': user.id,
+                    'id': user.pk,
                     'username': user.username,
                     'first_name': user.first_name,
                     'last_name': user.last_name,
@@ -225,14 +241,14 @@ class RegisterView(APIView):
         try:
             serializer = RegisterSerializer(data=request.data)
             if serializer.is_valid():
-                user = serializer.save()
+                user = cast(AbstractUser, serializer.save())
                 
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'access': str(refresh.access_token),
                     'refresh': str(refresh),
                     'user': {
-                        'id': user.id,
+                        'id': user.pk,
                         'firstname': user.first_name,
                         'lastname': user.last_name,
                         'email': user.email,

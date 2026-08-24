@@ -20,7 +20,7 @@ const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/login/Login"));
 const Register = lazy(() => import("./pages/register/Register"));
 const About = lazy(() => import("./pages/About"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard"));
 const Services = lazy(() => import("./pages/Services"));
 const Portfolio = lazy(() => import("./pages/Portfolio"));
 
@@ -40,16 +40,6 @@ function App() {
     
       <Routes>
         <Route
-  path="/AdminDashboard"
-  element={
-    <MainLayout>
-      <ProtectedRoute>
-        <AdminDashboard />
-      </ProtectedRoute>
-    </MainLayout>
-  }
-/>
-        <Route
   path="/admin-dashboard"
   element={
     <MainLayout>
@@ -59,18 +49,8 @@ function App() {
     </MainLayout>
   }
 />
-        <Route
-  path="/admin/dashboard"
-  element={
-    <MainLayout>
-      <ProtectedRoute>
-        <AdminDashboard />
-      </ProtectedRoute>
-    </MainLayout>
-  }
-/>
       <Route
-          path="/client_index"
+          path="/client_dashboard"
           element={
             <MainLayout>
               <ProtectedRoute>

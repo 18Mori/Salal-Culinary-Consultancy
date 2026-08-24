@@ -6,8 +6,14 @@ function Bill() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  // Track sidebar collapse state to apply responsive layout margin
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
+  
   const toggleSidebar = () => {
   setSidebarCollapsed(!sidebarCollapsed);
 };
@@ -50,16 +56,12 @@ function Bill() {
     return (
         <>
           <div className="min-h-screen bg-background">
-      <DNavigation 
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={toggleSidebar}
-        setLogout={setLogout} 
-      />
-      <main className={`ml-${sidebarCollapsed ? '16' : '64'} p-4 transition-all duration-300`}>
-        <DashboardContent 
-          userData={userData} 
-          loading={loading} 
-        />
+      <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      <main 
+        className="p-4 transition-all duration-300 ease-out"
+        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+      >
+        <DashboardContent loading={loading} />
       </main>
     </div>
         </>

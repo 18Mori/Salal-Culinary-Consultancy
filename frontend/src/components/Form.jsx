@@ -12,7 +12,7 @@ function Form({ route, method }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [passFeedback, setPassFeedback] = useState({
+  const [setPassFeedback] = useState({
     length: false,
     letter: false,
     number: false,
@@ -136,7 +136,7 @@ function Form({ route, method }) {
 
       const data = await res.json();
 
-      // Handle server-side errors
+      // Handle serverside errors
       if (!res.ok) {
         const newErrors = {};
         if (data.username) newErrors.username = Array.isArray(data.username) ? data.username[0] : data.username;
@@ -165,8 +165,33 @@ function Form({ route, method }) {
       localStorage.setItem(ACCESS_TOKEN, data.access);
       localStorage.setItem(REFRESH_TOKEN, data.refresh);
 
-      if (data.user) {
-        navigate('/client_index');
+      // --- DYNAMIC ROLE DETECTION & ROUTING ---
+      let isAdmin = false;
+
+      // 1. Check direct JSON response properties (data.user or data directly)
+      const userObj = data.user || data;
+      if (userObj.is_staff || userObj.is_superuser || userObj.role === 'admin') {
+        isAdmin = true;
+      }
+
+      // 2. Fallback: Parse claims inside JWT Access Token payload
+      if (!isAdmin && data.access) {
+        try {
+          const payloadBase64 = data.access.split('.')[1];
+          const decodedPayload = JSON.parse(atob(payloadBase64));
+          if (decodedPayload.is_staff || decodedPayload.is_superuser || decodedPayload.role === 'admin') {
+            isAdmin = true;
+          }
+        } catch (jwtError) {
+          console.error('Failed to parse token payload:', jwtError);
+        }
+      }
+
+      // 3. Conditional Navigation based on Admin status
+      if (isAdmin) {
+        navigate('/admin-dashboard'); // Make sure this path matches your router setup in App.jsx!
+      } else {
+        navigate('/client_dashboard');
       }
     } catch (error) {
       console.error('Network error:', error);
@@ -193,10 +218,8 @@ function Form({ route, method }) {
       <div className="w-full max-w-md">
         <div className="bg-cream rounded-xl shadow-lg border border-sage-200 p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-10 bg-terracotta/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-terracotta" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8 4-8-4-5 15 5 15L4 21l8 4 8-4 5-15-5-15Z" />
-              </svg>
+            <div className="w-16 h-16 bg-terracotta/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <img className="w-14 h-14" src="chef-hat.png" alt="Chef Hat" />
             </div>
             <h1 className="text-2xl font-bold text-charcoal mb-2">
               {method === 'login' ? 'Welcome Back' : 'Create Your Account'}

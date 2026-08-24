@@ -29,7 +29,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True, min_length=8)
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES, default='client', read_only=True)
+    role = serializers.ChoiceField(choices=getattr(User, 'ROLE_CHOICES', ()), default='client', read_only=True)
 
     class Meta:
         model = User
