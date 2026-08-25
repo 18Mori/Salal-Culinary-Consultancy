@@ -5,3 +5,6 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
 app = get_wsgi_application()
+
+# REQUIRED by Vercel serverless: map 'app' to 'handler'
+handler = app
