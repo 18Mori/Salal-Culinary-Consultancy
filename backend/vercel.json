@@ -1,0 +1,11 @@
+{
+  "builds": [
+    {
+      "src": "salal_proj/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "runtime": "python3.11"
+      }
+    }
+  ]
+}
