@@ -36,7 +36,7 @@ class AdminClientsView(APIView):
         clients = User.objects.filter(is_staff=False).order_by('-date_joined')
         data = []
         for client in clients:
-            activity_timestamp = client.last_seen or client.last_login
+            activity_timestamp = getattr(client, 'last_seen', None) or client.last_login
             
             if activity_timestamp:
                 diff = timezone.now() - activity_timestamp
@@ -65,7 +65,7 @@ class AdminClientsView(APIView):
                 'last_name': client.last_name,
                 'date_joined': client.date_joined,
                 'last_login': client.last_login,
-                'last_seen': client.last_seen,
+                'last_seen': getattr(client, 'last_seen', None),
                 'active_status': active_status,
             })
         return Response(data)
