@@ -3,15 +3,18 @@ import { ACCESS_TOKEN } from "../../../../constants";
 import DNavigation from "../DNavigation";
 import BookingForm from "../../../../components/BookingForm";
 import BookingList from "./BookingList";
-import SkeletonLoader from "../../../../components/SkeletonLoader";
+import Loader from "../../../../components/Loader";
 
 
 function Booking() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const toggleSidebar = () => {
-  };
+  // Track sidebar collapse state to apply responsive layout margin
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
 
   useEffect(() => {
     if (logout) {
@@ -46,26 +49,27 @@ function Booking() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <DNavigation 
-        onToggleCollapse={() => {}} 
-        setLogout={setLogout} 
-      />
-      <main className="p-4 transition-all duration-300">
+    <>
+      <div className="min-h-screen bg-background">
+      <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      <main 
+        className="transition-all duration-300 ease-out"
+        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+      >
         <DashboardContent loading={loading} />
       </main>
     </div>
+    </>
   );
 }
 
 function DashboardContent({ loading }) {
   if (loading) {
-    return <SkeletonLoader.Section />;
+    return <Loader.Section />;
   }
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
+    <div className="container">
       <BookingForm />
-      <BookingList />
     </div>
 
   );

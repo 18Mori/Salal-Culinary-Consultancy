@@ -6,437 +6,238 @@ function Home() {
   const isAuthenticated = !!localStorage.getItem(ACCESS_TOKEN);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-500 selection:text-slate-950">
       <HomeNav />
 
-      {/* Hero Section - Asymmetrical Grid */}
-      <section className="relative py-24 md:py-32 lg:py-48 overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden">
+        {/* Ambient Glows */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/10 blur-[140px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/3 right-10 w-[400px] h-[400px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Left Side - Imagery */}
-          <div className="lg:block lg:w-1/2">
-            <img
-              src="https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop"
-              alt="Gourmet culinary art"
-              className="w-full h-[600px] lg:h-full object-cover lg:aspect-[4/3] rounded-lg opacity-90 transition-opacity duration-500 hover:opacity-100"
-              loading="lazy"
-            />
-            {/* Image overlay gradient */}
-            <div className="absolute inset-0 bg-black/40 rounded-lg opacity-80 hover:opacity-100 transition-opacity duration-300" />
-          </div>
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            
+            {/* Left Column: Typographic Content */}
+            <div className="lg:col-span-7 space-y-8">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-amber-400 text-xs font-semibold tracking-wider uppercase">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                Michelin-Star Consultancy
+              </div>
 
-          {/* Right Side - Typographic Hero */}
-          <div className="lg:block lg:w-1/2 lg:pl-8 lg:pt-20">
-            <span
-              className="inline-block mb-6 px-4 py-2 bg-brass text-charcoal text-sm font-bold rounded-full tracking-tighter"
-            >
-              Michelin-Star Consultancy
-            </span>
-            <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-charcoal leading-tight mb-6 tracking-tight"
-            >
-              Elevating Culinary Standards
-            </h1>
-            <p
-              className="text-2xl md:text-3xl lg:text-4xl text-sage/80 max-w-xl mb-8 leading-relaxed"
-            >
-              Transform your culinary business with expert consultancy services. From restaurant operations to food safety compliance, we deliver results that matter.
-            </p>
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-light tracking-tight text-white leading-[1.1]">
+                Elevating Culinary <br />
+                <span className="font-serif italic font-normal text-amber-200">Standards.</span>
+              </h1>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <button
-                onClick={() => window.location.href = '/book'}
-                className="px-8 py-4 bg-brass text-charcoal rounded-lg font-medium hover:bg-terracotta transition-colors shadow-lg"
-              >
-                Book a Consultation
-              </button>
-              <button
-                onClick={() => window.location.href = '/about'}
-                className="px-8 py-4 border border-sage-300 text-charcoal rounded-lg hover:bg-sage-50 transition-colors"
-              >
-                Learn More
-              </button>
+              <p className="text-lg sm:text-xl text-slate-400 max-w-xl font-light leading-relaxed">
+                Transform your restaurant operations, optimize kitchen performance, and engineer unforgettable dining experiences with expert culinary leadership.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <button
+                  onClick={() => (window.location.href = "/book")}
+                  className="px-8 py-4 rounded-xl bg-amber-400 text-slate-950 font-semibold hover:bg-amber-300 transition-all duration-300 shadow-lg shadow-amber-400/20 active:scale-[0.98]"
+                >
+                  Book a Consultation
+                </button>
+                <button
+                  onClick={() => (window.location.href = "/about")}
+                  className="px-8 py-4 rounded-xl border border-slate-800 text-slate-300 font-medium hover:bg-slate-900 hover:text-white hover:border-slate-700 transition-all duration-300"
+                >
+                  Explore Practice
+                </button>
+              </div>
+
+              {isAuthenticated && (
+                <div className="pt-2">
+                  <button
+                    onClick={() => (window.location.href = "/client_index")}
+                    className="inline-flex items-center text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors gap-2"
+                  >
+                    Go to Client Portal &rarr;
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Auth CTA for authenticated users */}
-            {isAuthenticated ? (
-              <button
-                onClick={() => window.location.href = '/client_index'}
-                className="mt-4 px-8 py-3 bg-cream text-terracotta rounded-lg font-medium hover:bg-sage-50 transition-colors"
-              >
-                Go to Dashboard
-              </button>
-            ) : null}
+            {/* Right Column: Imagery with Clean Framing */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-2xl">
+                <img
+                  src="https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop"
+                  alt="Gourmet culinary art"
+                  className="w-full h-[500px] lg:h-[580px] object-cover scale-105 hover:scale-100 transition-transform duration-700 ease-out"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80" />
+                
+                <div className="absolute bottom-6 left-6 right-6 p-6 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-800/80">
+                  <p className="text-xs uppercase tracking-widest text-amber-400 font-semibold mb-1">Standard of Excellence</p>
+                  <p className="text-sm text-slate-300">Precision workflow and bespoke menu development tailored for world-class venues.</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* Philosophy Highlight Section */}
-      <section className="py-24 md:py-32 lg:py-48 bg-cream">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 lg:gap-16 items-center">
-            {/* Text Content */}
-            <div>
-              <span
-                className="inline-block mb-4 px-4 py-2 bg-brass text-charcoal text-sm font-bold rounded-full tracking-tighter"
-              >
+      {/* Philosophy Section */}
+      <section className="py-24 bg-slate-900/50 border-y border-slate-800/60 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            
+            <div className="lg:col-span-7 space-y-6">
+              <span className="text-xs font-semibold tracking-widest text-amber-400 uppercase">
                 Our Philosophy
               </span>
-              <h2
-                className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-charcoal leading-tight mb-6 tracking-tighter"
-              >
-                Crafting Culinary Excellence
+              <h2 className="text-3xl sm:text-5xl font-light text-white tracking-tight leading-tight">
+                Crafting Culinary <span className="font-serif italic text-slate-300">Excellence</span>
               </h2>
-              <p
-                className="text-lg md:text-xl text-sage/80 mb-8 leading-relaxed"
-              >
-                At Salal Culinary Consultancy, we believe that great food starts with great operations. Our
-                approach combines time-honored techniques with modern innovation, ensuring every kitchen we
-                touch operates with precision, creativity, and purpose.
+              <p className="text-slate-400 text-lg leading-relaxed font-light">
+                At Salal Culinary Consultancy, we believe exceptional guest experiences rest on engineered kitchen precision. We marry time-honored techniques with contemporary operational design.
               </p>
 
-              {/* Pull Quote */}
-              <blockquote
-                className="bg-white p-8 rounded-xl border border-sage-200 border-opacity-50 mt-8 ml-12 max-w-xl text-2xl md:text-2.5xl font-display italic text-charcoal/90 relative before:content-[''] before:absolute before:-top-4 before:left-6 before:w-12 before:h-12 before:bg-brass before:rounded-before before:after:content-[''] before:after:block before:after:w-[] before:after:h-[2] before:after:bg-before:after:before:after:before:after:before:after:before:after:before:after"
-              >
-                "The details are not the details. They make the design."
-                <cite className="text-sage/80 font-medium mt-4 block">— Charles Eames</cite>
+              <blockquote className="mt-8 p-6 rounded-2xl bg-slate-950 border border-slate-800 relative">
+                <p className="text-xl font-serif italic text-slate-200 leading-snug">
+                  "The details are not the details. They make the design."
+                </p>
+                <cite className="block text-sm font-sans not-italic text-slate-500 mt-3">— Charles Eames</cite>
               </blockquote>
             </div>
 
-            {/* Visual Element - Abstract Culinary Pattern */}
-            <div className="lg:mt-0 lg:ml-16">
-              <div
-                className="relative h-64 lg:h-80 rounded-3xl overflow-hidden bg-gradient-to-br from-terracotta/20 to-brass/20"
-              >
-                <div
-                  className="absolute -top-6 -left-6 w-32 h-32 bg-brass rounded-full opacity-50 blur-xl"
-                  aria-hidden="true"
-                />
-                <div
-                  className="absolute bottom-0 right-0 w-40 h-40 bg-terracotta rounded-full opacity-50 blur-xl"
-                  aria-hidden="true"
-                />
-              </div>
-              <p
-                className="text-center text-sage/60 text-sm mt-6"
-              >
-                Our team combines decades of Michelin-star experience with innovative culinary science.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Core Solutions Grid */}
-      <section className="py-24 md:py-32 lg:py-48">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Solution 1: Menu R&D */}
-            <article
-              className="group rounded-2xl overflow-hidden bg-white hover-shadow-xl transition-shadow duration-300 border border-sage-200"
-            >
-              <div
-                className="relative h-64 lg:h-80 bg-terracotta/20 group-hover:bg-terracotta/30 transition-colors duration-500"
-              >
-                <svg
-                  className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brass"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3
-                  className="text-2xl font-display font-bold text-charcoal mb-2 group-hover:text-brass transition-colors"
-                >
-                  Menu Research & Development
-                </h3>
-                <p
-                  className="text-sage/80 leading-relaxed mb-4"
-                >
-                  We craft signature menus that define culinary identities, blending seasonal ingredients
-                  with market positioning strategies that captivate diners and drive revenue.
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-sage/60">Learn More</span>
-                  <svg
-                    className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-                  </svg>
+            <div className="lg:col-span-5">
+              <div className="p-8 rounded-2xl bg-slate-950 border border-slate-800 relative overflow-hidden space-y-6">
+                <div className="w-12 h-12 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400 font-serif text-2xl">
+                  ✦
                 </div>
-              </div>
-            </article>
-
-            {/* Solution 2: Kitchen Workflow Optimization */}
-            <article
-              className="group rounded-2xl overflow-hidden bg-white hover-shadow-xl transition-shadow duration-300 border border-sage-200"
-            >
-              <div
-                className="relative h-64 lg:h-80 bg-sage/20 group-hover:bg-sage/30 transition-colors duration-500"
-              >
-                <svg
-                  className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brass"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3
-                  className="text-2xl font-display font-bold text-charcoal mb-2 group-hover:text-brass transition-colors"
-                >
-                  Kitchen Workflow Optimization
-                </h3>
-                <p
-                  className="text-sage/80 leading-relaxed mb-4"
-                >
-                  We analyze and redesign kitchen operations to eliminate bottlenecks, reduce waste, and
-                  increase throughput—transforming chaotic workflows into seamless, profitable processes.
+                <h3 className="text-xl font-medium text-white">Modern Culinary Science</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Our team brings multi-decade Michelin-star experience directly to your kitchen, streamlining operations while preserving culinary integrity.
                 </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-sage/60">Learn More</span>
-                  <svg
-                    className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-                  </svg>
-                </div>
               </div>
-            </article>
+            </div>
 
-            {/* Solution 3: Brand Positioning */}
-            <article
-              className="group rounded-2xl overflow-hidden bg-white hover-shadow-xl transition-shadow duration-300 border border-sage-200"
-            >
-              <div
-                className="relative h-64 lg:h-80 bg-primary/20 group-hover:bg-primary/30 transition-colors duration-500"
-              >
-                <svg
-                  className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brass"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-              </div>
-              <div className="p-6">
-                <h3
-                  className="text-2xl font-display font-bold text-charcoal mb-2 group-hover:text-brass transition-colors"
-                >
-                  Brand Positioning & Strategy
-                </h3>
-                <p
-                  className="text-sage/80 leading-relaxed mb-4"
-                >
-                  We help culinary establishments define and communicate their unique value proposition,
-                  ensuring every touchpoint reflects sophistication, authenticity, and market leadership.
+          </div>
+        </div>
+      </section>
+
+      {/* Solutions Section */}
+      <section className="py-28 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+            <span className="text-xs font-semibold tracking-widest text-amber-400 uppercase">Core Capabilities</span>
+            <h2 className="text-3xl sm:text-4xl font-light text-white">Tailored Culinary Solutions</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card 1 */}
+            <div className="group rounded-2xl p-8 bg-slate-900/40 border border-slate-800 hover:border-amber-400/50 hover:bg-slate-900 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-10 h-10 rounded-lg bg-amber-400/10 text-amber-400 flex items-center justify-center font-semibold">01</div>
+                <h3 className="text-xl font-medium text-white group-hover:text-amber-300 transition-colors">Menu Research & R&D</h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-light">
+                  Signature menus crafted to establish market identity, balance seasonal availability, and optimize margin performance.
                 </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-sage/60">Learn More</span>
-                  <svg
-                    className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-                  </svg>
-                </div>
               </div>
-            </article>
-          </div>
-        </div>
-      </section>
+              <a href="/services" className="inline-flex items-center text-xs font-semibold tracking-wider text-amber-400 uppercase mt-8 gap-2">
+                Learn More <span>&rarr;</span>
+              </a>
+            </div>
 
-      {/* Social Proof / Trust Section */}
-      <section className="py-24 md:py-32 lg:py-48 bg-charcoal">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div
-              className="bg-cream p-8 rounded-xl text-center border border-sage-200"
-            >
-              <div className="w-12 h-12 bg-brass rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-6 h-6 text-charcoal"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10L7 7m3-3v12m-2-3h10a2 2 0 002-2v-6a2 2 0 00-2-2H4a2 2 0 00-2 2v6a2 2 0 002 2m6 7v7m-3-3H13" />
-                </svg>
+            {/* Card 2 */}
+            <div className="group rounded-2xl p-8 bg-slate-900/40 border border-slate-800 hover:border-amber-400/50 hover:bg-slate-900 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-10 h-10 rounded-lg bg-amber-400/10 text-amber-400 flex items-center justify-center font-semibold">02</div>
+                <h3 className="text-xl font-medium text-white group-hover:text-amber-300 transition-colors">Workflow Optimization</h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-light">
+                  Kitchen floorplan and operational re-engineering to minimize bottlenecking, cut kitchen waste, and elevate output speed.
+                </p>
               </div>
-              <h3 className="text-xl font-display font-bold text-charcoal mb-3">10+ Years</h3>
-              <p className="text-sage/60">of Michelin-starred excellence</p>
+              <a href="/services" className="inline-flex items-center text-xs font-semibold tracking-wider text-amber-400 uppercase mt-8 gap-2">
+                Learn More <span>&rarr;</span>
+              </a>
             </div>
-            <div
-              className="bg-cream p-8 rounded-xl text-center border border-sage-200"
-            >
-              <div className="w-12 h-12 bg-brass rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-6 h-6 text-charcoal"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10L7 7m3-3v12m-2-3h10a2 2 0 002-2v-6a2 2 0 00-2-2H4a2 2 0 00-2 2v6a2 2 0 002 2m6 7v7m-3-3H13" />
-                </svg>
+
+            {/* Card 3 */}
+            <div className="group rounded-2xl p-8 bg-slate-900/40 border border-slate-800 hover:border-amber-400/50 hover:bg-slate-900 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-10 h-10 rounded-lg bg-amber-400/10 text-amber-400 flex items-center justify-center font-semibold">03</div>
+                <h3 className="text-xl font-medium text-white group-hover:text-amber-300 transition-colors">Brand & Strategy</h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-light">
+                  Positioning and identity alignment to ensure every touchpoint conveys luxury, precision, and culinary excellence.
+                </p>
               </div>
-              <h3 className="text-xl font-display font-bold text-charcoal mb-3">50+</h3>
-              <p className="text-sage/60">successful engagements</p>
-            </div>
-            <div
-              className="bg-cream p-8 rounded-xl text-center border border-sage-200"
-            >
-              <div className="w-12 h-12 bg-brass rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-6 h-6 text-charcoal"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10L7 7m3-3v12m-2-3h10a2 2 0 002-2v-6a2 2 0 00-2-2H4a2 2 0 00-2 2v6a2 2 0 002 2m6 7v7m-3-3H13" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-display font-bold text-charcoal mb-3">30+</h3>
-              <p className="text-sage/60">published publications</p>
-            </div>
-            <div
-              className="bg-cream p-8 rounded-xl text-center border border-sage-200"
-            >
-              <div className="w-12 h-12 bg-brass rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-6 h-6 text-charcoal"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10L7 7m3-3v12m-2-3h10a2 2 0 002-2v-6a2 2 0 00-2-2H4a2 2 0 00-2 2v6a2 2 0 002 2m6 7v7m-3-3H13" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-display font-bold text-charcoal mb-3">Available</h3>
-              <p className="text-sage/60">for consultation</p>
+              <a href="/services" className="inline-flex items-center text-xs font-semibold tracking-wider text-amber-400 uppercase mt-8 gap-2">
+                Learn More <span>&rarr;</span>
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section - Full Width */}
-      <section className="py-24 md:py-32 lg:py-48 bg-terracotta">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className="absolute inset-0 bg-black/30 blur-lg opacity-50"
-            aria-hidden="true"
-          />
-          <div className="relative text-center">
-            <span
-              className="inline-block px-4 py-2 bg-charcoal text-cream text-sm font-bold rounded-full tracking-tighter mb-6"
-            >
-              Ready to Transform Your Kitchen?
-            </span>
-            <h2
-              className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-charcoal mb-6 tracking-tight"
-            >
-              Let's Create Culinary Excellence Together
-            </h2>
-            <p
-              className="text-2xl md:text-xl text-cream/80 max-w-2xl mx-auto mb-8 leading-relaxed"
-            >
-              Schedule a free consultation and discover how our expertise can elevate your culinary operation.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {isAuthenticated ? (
-                <button
-                  onClick={() => window.location.href = '/client_index'}
-                  className="px-8 py-3 bg-cream text-terracotta rounded-lg font-medium hover:bg-sage-50 transition-colors"
-                >
-                  Access Dashboard
-                </button>
-              ) : (
-                <button
-                  onClick={() => window.location.href = '/login'}
-                  className="px-8 py-3 bg-cream text-terracotta rounded-lg font-medium hover:bg-sage-50 transition-colors"
-                >
-                  Schedule Consultation
-                </button>
-              )}
+      {/* Metrics Section */}
+      <section className="py-20 bg-slate-900/30 border-t border-slate-800/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center p-6 border-r last:border-r-0 border-slate-800/80">
+              <div className="text-4xl sm:text-5xl font-light text-white mb-2">10+</div>
+              <p className="text-xs uppercase tracking-widest text-slate-400">Years Industry Leadership</p>
+            </div>
+            <div className="text-center p-6 border-r last:border-r-0 border-slate-800/80">
+              <div className="text-4xl sm:text-5xl font-light text-white mb-2">50+</div>
+              <p className="text-xs uppercase tracking-widest text-slate-400">Engagements Completed</p>
+            </div>
+            <div className="text-center p-6 border-r last:border-r-0 border-slate-800/80">
+              <div className="text-4xl sm:text-5xl font-light text-white mb-2">30+</div>
+              <p className="text-xs uppercase tracking-widest text-slate-400">Published Feature Studies</p>
+            </div>
+            <div className="text-center p-6">
+              <div className="text-4xl sm:text-5xl font-light text-amber-400 mb-2">100%</div>
+              <p className="text-xs uppercase tracking-widest text-slate-400">Client Confidentiality</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Mobile Nav CTA */}
-      <footer className="bg-charcoal py-8 md:py-12">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-brass rounded-sm flex items-center justify-center">
-                <img
-                  src="chef-hat.png"
-                  alt="Chef Hat"
-                  className="w-5 h-5"
-                />
-              </div>
-              <span
-                className="font-display font-semibold text-xl text-cream"
-              >
-                Salal Culinary
-              </span>
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a
-                href="/"
-                className="text-sage/60 hover:text-brass transition-colors"
-              >
-                Home
-              </a>
-              <a
-                href="/about"
-                className="text-sage/60 hover:text-brass transition-colors"
-              >
-                About
-              </a>
-              <a
-                href="/services"
-                className="text-sage/60 hover:text-brass transition-colors"
-              >
-                Services
-              </a>
-              <a
-                href="/portfolio"
-                className="text-sage/60 hover:text-brass transition-colors"
-              >
-                Portfolio
-              </a>
-            </div>
-          </div>
-          <p className="mt-4 text-sage/60 text-center">
-            © {new Date().getFullYear()} Salal Culinary Consultancy. All rights reserved.
+      {/* CTA Section */}
+      <section className="py-28 relative overflow-hidden bg-gradient-to-b from-slate-950 to-slate-900 border-t border-slate-800">
+        <div className="max-w-4xl mx-auto px-4 text-center space-y-8 relative z-10">
+          <h2 className="text-4xl sm:text-6xl font-light text-white tracking-tight">
+            Ready to Transform Your <span className="font-serif italic text-amber-200">Operation?</span>
+          </h2>
+          <p className="text-slate-400 text-lg max-w-xl mx-auto font-light">
+            Schedule a private consultation to review your current setup and explore tailored growth strategies.
           </p>
+          <div>
+            <button
+              onClick={() => (window.location.href = isAuthenticated ? "/client_index" : "/login")}
+              className="px-10 py-4 rounded-xl bg-amber-400 text-slate-950 font-semibold hover:bg-amber-300 transition-all duration-300 shadow-xl shadow-amber-400/10"
+            >
+              {isAuthenticated ? "Access Client Dashboard" : "Schedule Consultation"}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-950 py-12 border-t border-slate-900 text-sm text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 font-serif">
+              S
+            </div>
+            <span className="font-medium text-slate-200 tracking-wide">Salal Culinary Consultancy</span>
+          </div>
+          <div className="flex space-x-8">
+            <a href="/" className="hover:text-amber-400 transition-colors">Home</a>
+            <a href="/about" className="hover:text-amber-400 transition-colors">About</a>
+            <a href="/services" className="hover:text-amber-400 transition-colors">Services</a>
+            <a href="/portfolio" className="hover:text-amber-400 transition-colors">Portfolio</a>
+          </div>
+          <p>© {new Date().getFullYear()} Salal Culinary Consultancy.</p>
         </div>
       </footer>
     </div>

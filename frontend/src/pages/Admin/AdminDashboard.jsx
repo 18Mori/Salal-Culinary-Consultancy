@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminNavigation from './components/AdminNavigation';
-import SkeletonLoader from '../../components/SkeletonLoader';
+import Loader from '../../components/Loader';
 import { ACCESS_TOKEN } from '../../constants';
 
 // --- Activity Helper Calculations ---
@@ -178,49 +178,44 @@ const AdminDashboard = () => {
 
   const statuses = ['New', 'Assigned', 'Resolved'];
 
-  // Silent polling fetcher to update client directory without triggering loading skeletons
-  const fetchClientDirectory = async (isInitial = false) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    if (!token) {
-      window.location.href = '/login';
-      return;
-    }
+  // Explicitly defined fetcher function for Client Directory
+  const fetchClientDirectory = async () => {
+    const token = localStorage.getItem(ACCESS_TOKEN) || localStorage.getItem('access');
+    if (!token) return;
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+    const rawUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+    const baseUrl = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
     try {
-      const clientsRes = await fetch(`${apiUrl}/api/admin/clients/`, {
+      const res = await fetch(`${baseUrl}/api/admin/clients/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      if (clientsRes.ok) {
-        const clientsData = await clientsRes.json();
-        setClients(Array.isArray(clientsData) ? clientsData : clientsData.results || []);
-      } else if (clientsRes.status === 403) {
-        setShowUnauthorizedModal(true);
+      if (res.ok) {
+        const data = await res.json();
+        setClients(data);
       }
     } catch (err) {
-      if (isInitial) setError('Network error or insufficient permissions');
-      console.error('Error fetching clients directory:', err);
+      console.error('Failed to fetch client directory:', err);
     }
   };
 
   useEffect(() => {
     const initialFetch = async () => {
-      const token = localStorage.getItem(ACCESS_TOKEN);
+      const token = localStorage.getItem(ACCESS_TOKEN) || localStorage.getItem('access');
       if (!token) {
         window.location.href = '/login';
         return;
       }
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+      const rawUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+      const baseUrl = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
       try {
-        const bookingsRes = await fetch(`${apiUrl}/api/admin/bookings/`, {
+        const bookingsRes = await fetch(`${baseUrl}/api/admin/bookings/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
-        await fetchClientDirectory(true);
+        await fetchClientDirectory();
 
         if (bookingsRes.ok) {
           const bookingsData = await bookingsRes.json();
@@ -240,20 +235,21 @@ const AdminDashboard = () => {
 
     initialFetch();
 
-    // Setup periodic polling every 15 seconds for live activity directory status updates
+    // Setup periodic polling every 10 seconds for real-time user directory status updates
     const pollInterval = setInterval(() => {
-      fetchClientDirectory(false);
-    }, 15000);
+      fetchClientDirectory();
+    }, 10000);
 
     return () => clearInterval(pollInterval);
   }, []);
 
   const handleDeleteClient = async (userId) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+    const token = localStorage.getItem(ACCESS_TOKEN) || localStorage.getItem('access');
+    const rawUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+    const baseUrl = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
     try {
-      const res = await fetch(`${apiUrl}/api/admin/clients/${userId}/`, {
+      const res = await fetch(`${baseUrl}/api/admin/clients/${userId}/`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -273,11 +269,12 @@ const AdminDashboard = () => {
   };
 
   const handleUpdateBooking = async (bookingId, updatedFields) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+    const token = localStorage.getItem(ACCESS_TOKEN) || localStorage.getItem('access');
+    const rawUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+    const baseUrl = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
     try {
-      const res = await fetch(`${apiUrl}/api/admin/bookings/${bookingId}/`, {
+      const res = await fetch(`${baseUrl}/api/admin/bookings/${bookingId}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -310,7 +307,7 @@ const AdminDashboard = () => {
 
   const assignedChefsCount = new Set(bookings.map(b => b.assigned_chef).filter(Boolean)).size;
 
-  if (loading) return <SkeletonLoader.Section />;
+  if (loading) return <Loader.Section />;
   if (error) return <div className="min-h-screen bg-background flex items-center justify-center p-6 text-terracotta text-xl">{error}</div>;
 
   return (
@@ -495,7 +492,7 @@ const AdminDashboard = () => {
                           {booking.client_email ? (
                             <a
                               href={`mailto:${booking.client_email}?subject=Salal Culinary Consultation: ${booking.booking_title || 'Request'}&body=Hello ${booking.client_username || 'Client'},%0D%0A%0D%0ARegarding your consultation request for "${booking.booking_title || 'Service'}" (${booking.service_type || 'Consultation'}):%0D%0A%0D%0A`}
-                              className="px-3 py-1.5 bg-charcoal text-white rounded-lg hover:bg-black transition-colors inline-block text-xs font-semibold"
+                              className="px-3 py-1.5 bg-charcoal text-white rounded-lg hover:bg-black transition-colors inline-block text-xs text-center font-semibold"
                             >
                               Email Client
                             </a>
@@ -523,7 +520,7 @@ const AdminDashboard = () => {
               <h2 className="text-lg font-bold text-gray-800">User Activity & Directory ({clients.length})</h2>
               <span className="text-xs text-gray-400 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Live Auto-Syncing (15s)
+                Live Auto Syncing (10s)
               </span>
             </div>
             <div className="overflow-x-auto">

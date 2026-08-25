@@ -9,6 +9,8 @@ class User(AbstractUser):
         ('admin', 'Admin'),
     ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='client')
+    # Track real-time active status
+    last_seen = models.DateTimeField(null=True, blank=True)
 
     @property
     def is_admin(self):

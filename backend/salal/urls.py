@@ -7,6 +7,9 @@ urlpatterns = [
     path('admin/clients/', AdminClientsView.as_view(), name='admin-clients'),
     path('admin/clients/<int:user_id>/', AdminDeleteClientView.as_view(), name='admin-delete-client'),
     
+    # Global Real-Time Heartbeat Endpoint
+    path('user/heartbeat/', UserHeartbeatView.as_view(), name='user-heartbeat'),
+
     path('user/', user_detail, name='user-detail'),
     path('auth/login/', LoginView.as_view(), name='login'),
     path('auth/register/', RegisterView.as_view(), name='register'),

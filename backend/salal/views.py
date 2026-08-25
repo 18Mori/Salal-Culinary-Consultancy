@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .serializers import *
 from .models import *
-from rest_framework.permissions import AllowAny,IsAuthenticated, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,8 +13,20 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
 import logging
 from typing import cast
+
+User = get_user_model()
 logger = logging.getLogger(__name__)
 
+
+class UserHeartbeatView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        user.last_seen = timezone.now()
+        user.save(update_fields=['last_seen'])
+        return Response({'status': 'active', 'last_seen': user.last_seen}, status=status.HTTP_200_OK)
 
 
 class AdminClientsView(APIView):
@@ -24,16 +36,23 @@ class AdminClientsView(APIView):
         clients = User.objects.filter(is_staff=False).order_by('-date_joined')
         data = []
         for client in clients:
-            last_login = client.last_login
-            if last_login:
-                diff = timezone.now() - last_login
-                if diff.total_seconds() < 900:
+            activity_timestamp = client.last_seen or client.last_login
+            
+            if activity_timestamp:
+                diff = timezone.now() - activity_timestamp
+                total_seconds = diff.total_seconds()
+                
+                # Active if pinged within the last 2 minutes (120s)
+                if total_seconds < 120:
                     active_status = "Active now"
-                elif diff.total_seconds() < 86400:
-                    hours = int(diff.total_seconds() // 3600)
+                elif total_seconds < 3600:
+                    mins = int(total_seconds // 60)
+                    active_status = f"Active {mins}m ago"
+                elif total_seconds < 86400:
+                    hours = int(total_seconds // 3600)
                     active_status = f"Active {hours} hour{'s' if hours > 1 else ''} ago"
                 else:
-                    days = int(diff.total_seconds() // 86400)
+                    days = int(total_seconds // 86400)
                     active_status = f"Active {days} day{'s' if days > 1 else ''} ago"
             else:
                 active_status = "Inactive"
@@ -46,6 +65,7 @@ class AdminClientsView(APIView):
                 'last_name': client.last_name,
                 'date_joined': client.date_joined,
                 'last_login': client.last_login,
+                'last_seen': client.last_seen,
                 'active_status': active_status,
             })
         return Response(data)
@@ -95,7 +115,6 @@ class AdminBookingUpdateView(APIView):
         except Booking.DoesNotExist:
             return Response({'error': 'Booking not found'}, status=404)
     
-    #  Delete a client and their bookings
 class AdminDeleteClientView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -107,7 +126,7 @@ class AdminDeleteClientView(APIView):
             )
         try:
             user = User.objects.get(id=user_id)
-            user.delete()  # Cascades to delete booking
+            user.delete()
             return Response({"message": "Client deleted"}, status=204)
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
@@ -135,21 +154,17 @@ class ClientDashboardView(APIView):
     def get(self, request):
         user = request.user
         
-        if not user.last_login_at:
-            user.last_login_at = timezone.now()
-            user.save(update_fields=['last_login_at'])
+        # Keep user active while accessing dashboard
+        user.last_seen = timezone.now()
+        user.save(update_fields=['last_seen'])
             
-            # Fetch all required data
         stats = self._get_dashboard_stats(user)
         upcoming_consultations = self._get_upcoming_consultations(user)
         
-        # Serialize
-        stats_data = stats
-        
         return Response({
-                'stats': stats_data,
-                'upcoming_consultations': BookingSerializer(upcoming_consultations, many=True).data,
-            })
+            'stats': stats,
+            'upcoming_consultations': BookingSerializer(upcoming_consultations, many=True).data,
+        })
         
 class BookingView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -212,6 +227,11 @@ class LoginView(APIView):
                     {'non_field_errors': ['This account is inactive.']}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
+
+            # Record login timestamp & last_seen timestamp
+            user.last_login = timezone.now()
+            setattr(user, 'last_seen', timezone.now())
+            user.save(update_fields=['last_login', 'last_seen'])
                 
             refresh = RefreshToken.for_user(user)
             
@@ -224,7 +244,7 @@ class LoginView(APIView):
                     'first_name': user.first_name,
                     'last_name': user.last_name,
                     'email': user.email, 
-                        }
+                }
             }, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"Login error: {str(e)}", exc_info=True)
@@ -243,6 +263,9 @@ class RegisterView(APIView):
             if serializer.is_valid():
                 user = cast(AbstractUser, serializer.save())
                 
+                setattr(user, 'last_seen', timezone.now())
+                user.save(update_fields=['last_seen'])
+
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'access': str(refresh.access_token),

@@ -5,7 +5,7 @@ import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Booking from "./pages/ClientDashboard/components/page/Booking"
 import Bill from "./pages/ClientDashboard/components/page/Bill"
-import SkeletonLoader from "./components/SkeletonLoader";
+import Loader from "./components/Loader";
 import { Suspense, lazy } from "react";
 
 
@@ -82,7 +82,7 @@ function App() {
         <Route
           path="/"
           element={
-            <Suspense fallback={<SkeletonLoader.Section />}>
+            <Suspense fallback={<Loader.Section />}>
               <MainLayout>
                 <Home />
               </MainLayout>
@@ -90,32 +90,32 @@ function App() {
           }
         />
         <Route path="/about" element={
-          <Suspense fallback={<SkeletonLoader.Section />}>
+          <Suspense fallback={<Loader.Section />}>
             <MainLayout><About /></MainLayout>
           </Suspense>
           } />
         <Route path="/services" element={
-          <Suspense fallback={<SkeletonLoader.Section />}>
+          <Suspense fallback={<Loader.Section />}>
             <MainLayout><Services /></MainLayout>
           </Suspense>
           } />
         <Route path="/portfolio" element={
-          <Suspense fallback={<SkeletonLoader.Section />}>
+          <Suspense fallback={<Loader.Section />}>
             <MainLayout><Portfolio /></MainLayout>
           </Suspense>
           } />
         <Route path="/login" element={
-          <Suspense fallback={<SkeletonLoader.Section />}>
+          <Suspense fallback={<Loader.Section />}>
           <MainLayout><Login /></MainLayout>
           </Suspense>
           } />
         <Route path="/logout" element={
-          <Suspense fallback={<SkeletonLoader.Section />}>
+          <Suspense fallback={<Loader.Section />}>
           <MainLayout><Logout /></MainLayout>
           </Suspense>
           } />
         <Route path="/register" element={
-          <Suspense fallback={<SkeletonLoader.Section />}>
+          <Suspense fallback={<Loader.Section />}>
           <MainLayout><Register /></MainLayout>
           </Suspense>
           } />
