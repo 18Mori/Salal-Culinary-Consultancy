@@ -1,16 +1,18 @@
 import react from "react"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import ClientDashboard from "./pages/ClientDashboard/client_index"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Booking from "./pages/ClientDashboard/components/page/Booking"
 import Bill from "./pages/ClientDashboard/components/page/Bill"
-import LoadingIndicator from "./components/LoadingIndicator"
+import Loader from "./components/Loader";
 import { Suspense, lazy } from "react";
 
 
 function Logout() {
-  localStorage.clear();
+  localStorage.removeItem('access');
+  localStorage.removeItem('refresh');
+  localStorage.removeItem('sidebarCollapsed');
   window.location.href = '/login';
   return <div style={{ textAlign: 'center', padding: '50px' }}>Logging out...</div>;
 }
@@ -18,7 +20,9 @@ const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/login/Login"));
 const Register = lazy(() => import("./pages/register/Register"));
 const About = lazy(() => import("./pages/About"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard"));
+const Services = lazy(() => import("./pages/Services"));
+const Portfolio = lazy(() => import("./pages/Portfolio"));
 
 
 function MainLayout({ children }) {
@@ -36,7 +40,7 @@ function App() {
     
       <Routes>
         <Route
-  path="/AdminDashboard"
+  path="/admin-dashboard"
   element={
     <MainLayout>
       <ProtectedRoute>
@@ -46,7 +50,7 @@ function App() {
   }
 />
       <Route
-          path="/client_index"
+          path="/client_dashboard"
           element={
             <MainLayout>
               <ProtectedRoute>
@@ -55,6 +59,7 @@ function App() {
             </MainLayout>
           }
         />
+        <Route path="/client_index" element={<Navigate to="/client_dashboard" replace />} />
         <Route
           path="/booking"
           element={
@@ -78,7 +83,7 @@ function App() {
         <Route
           path="/"
           element={
-            <Suspense fallback={<LoadingIndicator />}>
+            <Suspense fallback={<Loader.Section />}>
               <MainLayout>
                 <Home />
               </MainLayout>
@@ -86,22 +91,32 @@ function App() {
           }
         />
         <Route path="/about" element={
-          <Suspense fallback={<LoadingIndicator />}>
+          <Suspense fallback={<Loader.Section />}>
             <MainLayout><About /></MainLayout>
           </Suspense>
           } />
+        <Route path="/services" element={
+          <Suspense fallback={<Loader.Section />}>
+            <MainLayout><Services /></MainLayout>
+          </Suspense>
+          } />
+        <Route path="/portfolio" element={
+          <Suspense fallback={<Loader.Section />}>
+            <MainLayout><Portfolio /></MainLayout>
+          </Suspense>
+          } />
         <Route path="/login" element={
-          <Suspense fallback={<LoadingIndicator />}>
+          <Suspense fallback={<Loader.Section />}>
           <MainLayout><Login /></MainLayout>
           </Suspense>
           } />
         <Route path="/logout" element={
-          <Suspense fallback={<LoadingIndicator />}>
+          <Suspense fallback={<Loader.Section />}>
           <MainLayout><Logout /></MainLayout>
           </Suspense>
           } />
         <Route path="/register" element={
-          <Suspense fallback={<LoadingIndicator />}>
+          <Suspense fallback={<Loader.Section />}>
           <MainLayout><Register /></MainLayout>
           </Suspense>
           } />

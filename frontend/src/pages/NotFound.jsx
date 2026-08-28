@@ -1,25 +1,29 @@
 import { Link } from 'react-router-dom';
 
 function NotFound() {
-    return <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
-        <div className="flex justify-center mb-6">
-          <div className="relative">
-            <h1 className="text-9xl font-bold text-primary opacity-20"
-            aria-hidden="true">
-              404
-            </h1>
-          </div>
-        </div>
-        <h2 className="flex justify-center mb-6 text-2xl font-medium text-onBackground ">Page Not Found</h2>
-        <p className="flex justify-center mb-6 text-onBackground/70">
-          The page you're looking for doesn't exist. Let's get you back!
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-100 px-4 relative overflow-hidden font-sans">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-amber-500/10 blur-[150px] rounded-full pointer-events-none" />
+
+      <div className="text-center space-y-6 relative z-10 max-w-md">
+        <h1 className="text-8xl font-light tracking-tight text-amber-400 font-mono">
+          404
+        </h1>
+        <h2 className="text-2xl font-light text-white">Page Not Found</h2>
+        <p className="text-slate-400 text-sm leading-relaxed font-light">
+          The requested page could not be located. Let's return you to safety.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/" className="bg-gray-50 text-gray-500 hover:text-black py-2 px-4 rounded">
-              Go to Home
+        <div>
+          <Link
+            to="/"
+            className="inline-block px-8 py-3.5 rounded-xl bg-amber-400 text-slate-950 font-semibold hover:bg-amber-300 transition-all shadow-lg shadow-amber-400/10"
+          >
+            Return Home
           </Link>
         </div>
+      </div>
     </div>
+  );
 }
 
-export default NotFound
+export default NotFound;

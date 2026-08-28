@@ -1,7 +1,6 @@
-from django.contrib.auth.models import User
-from rest_framework import serializers
-from .models import *
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from .models import Booking
 import re
 
 User = get_user_model()
@@ -9,7 +8,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'date_joined', 'last_login']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'date_joined', 'last_login', 'last_seen']
 
 class AdminBookingSerializer(serializers.ModelSerializer):
     client_username = serializers.CharField(source='client.username')
@@ -29,14 +28,14 @@ class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True, min_length=8)
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES, default='client', read_only=True)
+    role = serializers.ChoiceField(choices=getattr(User, 'ROLE_CHOICES', ()), default='client', read_only=True)
 
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm', 'role']
         
     def validate(self, attrs):
-      if attrs['password'] != attrs.pop('password_confirm'):
+      if attrs['password'] != attrs['password_confirm']:
         raise serializers.ValidationError({'password_confirm': "Passwords do not match"})
       
       if User.objects.filter(username=attrs['username']).exists():
@@ -70,8 +69,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     client_username = serializers.CharField(source='client.username', read_only=True)
+    assigned_chef = serializers.ChoiceField(choices=Booking.CHEFS, allow_blank=True, required=False)
+    status = serializers.ChoiceField(choices=Booking.STATUS_CHOICES, required=False)
     
     class Meta:
         model = Booking
-        fields = ['id', 'client', 'client_username', 'title', 'date', 'time', 'notes', 'duration', 'service_type', 'created_at', 'updated_at', 'session_type']
+        fields = ['id', 'client', 'client_username', 'title', 'date', 'time', 'notes', 'duration', 'service_type', 'created_at', 'updated_at', 'session_type', 'assigned_chef', 'status']
         read_only_fields = ['id', 'created_at', 'client_username']

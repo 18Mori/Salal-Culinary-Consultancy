@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .serializers import *
 from .models import *
-from rest_framework.permissions import AllowAny,IsAuthenticated, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,8 +12,21 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
 import logging
+from typing import cast
+
+User = get_user_model()
 logger = logging.getLogger(__name__)
 
+
+class UserHeartbeatView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        user.last_seen = timezone.now()
+        user.save(update_fields=['last_seen'])
+        return Response({'status': 'active', 'last_seen': user.last_seen}, status=status.HTTP_200_OK)
 
 
 class AdminClientsView(APIView):
@@ -23,14 +36,37 @@ class AdminClientsView(APIView):
         clients = User.objects.filter(is_staff=False).order_by('-date_joined')
         data = []
         for client in clients:
+            activity_timestamp = getattr(client, 'last_seen', None) or client.last_login
+            
+            if activity_timestamp:
+                diff = timezone.now() - activity_timestamp
+                total_seconds = diff.total_seconds()
+                
+                # Active if pinged within the last 2 minutes (120s)
+                if total_seconds < 120:
+                    active_status = "Active now"
+                elif total_seconds < 3600:
+                    mins = int(total_seconds // 60)
+                    active_status = f"Active {mins}m ago"
+                elif total_seconds < 86400:
+                    hours = int(total_seconds // 3600)
+                    active_status = f"Active {hours} hour{'s' if hours > 1 else ''} ago"
+                else:
+                    days = int(total_seconds // 86400)
+                    active_status = f"Active {days} day{'s' if days > 1 else ''} ago"
+            else:
+                active_status = "Inactive"
+
             data.append({
-                'id': client.id,
+                'id': client.pk,
                 'username': client.username,
                 'email': client.email,
                 'first_name': client.first_name,
                 'last_name': client.last_name,
                 'date_joined': client.date_joined,
                 'last_login': client.last_login,
+                'last_seen': getattr(client, 'last_seen', None),
+                'active_status': active_status,
             })
         return Response(data)
 
@@ -42,19 +78,40 @@ class AdminBookingsView(APIView):
         data = []
         for booking in bookings:
             data.append({
-                'id': booking.id,
+                'id': booking.pk,
+                'client_id': booking.client.pk,
                 'client_username': booking.client.username,
                 'client_email': booking.client.email,
                 'booking_title': booking.title,
                 'service_type': booking.service_type,
                 'date': booking.date,
                 'time': booking.time,
+                'notes': booking.notes,
                 'created_at': booking.created_at,
-                'session_type': booking.get_session_type_display(),
+                'session_type': booking.session_type,
+                'assigned_chef': booking.assigned_chef,
+                'status': booking.status,
             })
         return Response(data)
+
+class AdminBookingUpdateView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, pk):
+        try:
+            booking = Booking.objects.get(pk=pk)
+            serializer = BookingSerializer(booking, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({
+                'id': booking.pk,
+                'assigned_chef': booking.assigned_chef,
+                'status': booking.status,
+                'message': 'Booking updated successfully'
+            })
+        except Booking.DoesNotExist:
+            return Response({'error': 'Booking not found'}, status=404)
     
-    #  Delete a client and their bookings
 class AdminDeleteClientView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -66,7 +123,7 @@ class AdminDeleteClientView(APIView):
             )
         try:
             user = User.objects.get(id=user_id)
-            user.delete()  # Cascades to delete booking
+            user.delete()
             return Response({"message": "Client deleted"}, status=204)
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
@@ -76,24 +133,35 @@ class ClientDashboardView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def _get_dashboard_stats(self, user):
+        bookings = Booking.objects.filter(client=user)
+        today = timezone.localdate()
+        return {
+            'total_bookings': bookings.count(),
+            'upcoming_bookings': bookings.filter(date__gte=today).count(),
+            'completed_bookings': bookings.filter(date__lt=today).count(),
+        }
+
+    def _get_upcoming_consultations(self, user):
+        return Booking.objects.filter(
+            client=user,
+            date__gte=timezone.localdate(),
+        ).order_by('date', 'time')
+
     def get(self, request):
         user = request.user
         
-        if not user.last_login_at:
-            user.last_login_at = timezone.now()
-            user.save(update_fields=['last_login_at'])
+        # Keep user active while accessing dashboard
+        user.last_seen = timezone.now()
+        user.save(update_fields=['last_seen'])
             
-            # Fetch all required data
         stats = self._get_dashboard_stats(user)
         upcoming_consultations = self._get_upcoming_consultations(user)
         
-        # Serialize
-        stats_data = stats
-        
         return Response({
-                'stats': stats_data,
-                'upcoming_consultations': BookingSerializer(upcoming_consultations, many=True).data,
-            })
+            'stats': stats,
+            'upcoming_consultations': BookingSerializer(upcoming_consultations, many=True).data,
+        })
         
 class BookingView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -134,65 +202,93 @@ class LoginView(APIView):
     permission_classes = []
     
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        
-        if not username or not password:
-            return Response(
-                {'username': 'Username is required', 'password': 'Password is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        try:
+            username = request.data.get('username')
+            password = request.data.get('password')
             
-        user = authenticate(request, username=username, password=password)
-        if not user:
-            return Response(
-                {'non_field_errors': ['Invalid username or password.']}, 
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+            if not username or not password:
+                return Response(
+                    {'username': 'Username is required', 'password': 'Password is required'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            user = authenticate(request, username=username, password=password)
+            if not user:
+                return Response(
+                    {'non_field_errors': ['Invalid username or password.']}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+                
+            if not user.is_active:
+                return Response(
+                    {'non_field_errors': ['This account is inactive.']}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+
+            # Record login timestamp & last_seen timestamp
+            user.last_login = timezone.now()
+            setattr(user, 'last_seen', timezone.now())
+            user.save(update_fields=['last_login', 'last_seen'])
+                
+            refresh = RefreshToken.for_user(user)
             
-        if not user.is_active:
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': {
+                    'id': user.pk,
+                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'email': user.email, 
+                    'is_staff': user.is_staff,
+                    'is_superuser': user.is_superuser,
+                    'role': user.role,
+                }
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Login error: {str(e)}", exc_info=True)
             return Response(
-                {'non_field_errors': ['This account is inactive.']}, 
-                status=status.HTTP_401_UNAUTHORIZED
+                {'non_field_errors': ['An unexpected error occurred during login. Please try again.']},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            
-        refresh = RefreshToken.for_user(user)
-        
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'email': user.email, 
-                    }
-        }, status=status.HTTP_200_OK)
         
         
 class RegisterView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-                'user': {
-                    'id': user.id,
-                    'firstname': user.first_name,
-                    'lastname': user.last_name,
-                    'email': user.email,
-                    'username': user.username,
-                }
-            }, status=status.HTTP_201_CREATED)
-            
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            serializer = RegisterSerializer(data=request.data)
+            if serializer.is_valid():
+                user = cast(AbstractUser, serializer.save())
+                
+                setattr(user, 'last_seen', timezone.now())
+                user.save(update_fields=['last_seen'])
+
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                    'user': {
+                        'id': user.pk,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'email': user.email,
+                        'username': user.username,
+                        'is_staff': user.is_staff,
+                        'is_superuser': user.is_superuser,
+                        'role': user.role,
+                    }
+                }, status=status.HTTP_201_CREATED)
+                
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Registration error: {str(e)}", exc_info=True)
+            return Response(
+                {'non_field_errors': ['An unexpected error occurred during registration. Please try again.']},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -202,4 +298,7 @@ def user_detail(request):
         'first_name': request.user.first_name,
         'last_name': request.user.last_name, 
         'email': request.user.email,
+        'is_staff': request.user.is_staff,
+        'is_superuser': request.user.is_superuser,
+        'role': request.user.role,
     })

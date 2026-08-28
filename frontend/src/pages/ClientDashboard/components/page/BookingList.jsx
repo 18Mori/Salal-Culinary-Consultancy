@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN } from "../../../../constants";
-import LoadingIndicator from "../../../../components/LoadingIndicator";
+import Loader from "../../../../components/Loader";
 import { toast } from "react-hot-toast";
 
 const BookingList = () => {
@@ -85,7 +85,7 @@ const BookingList = () => {
     }
   };
 
-  if (loading) return <LoadingIndicator />;
+  if (loading) return <Loader.Section />;
   if (booking.length === 0) {
     return (
       <div className="text-center py-12 bg-muted rounded-lg">

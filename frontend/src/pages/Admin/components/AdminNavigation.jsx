@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../../../constants';
 
-const DNavigation = ({ onToggleCollapse }) => {
+const AdminNavigation = ({ onToggleCollapse }) => {
   const location = useLocation();
 
   const [fullName, setFullName] = useState('');
@@ -20,7 +20,9 @@ const DNavigation = ({ onToggleCollapse }) => {
       }
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/`, {
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+        const cleanUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+        const res = await fetch(`${cleanUrl}/api/user/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -83,7 +85,7 @@ const DNavigation = ({ onToggleCollapse }) => {
                 Salal <span className="font-serif italic text-amber-200">Culinary</span>
               </span>
               <span className="text-[10px] text-amber-400/80 uppercase tracking-widest font-semibold leading-tight">
-                Client Portal
+                Admin Panel
               </span>
             </div>
           </div>
@@ -114,9 +116,9 @@ const DNavigation = ({ onToggleCollapse }) => {
       {/* Navigation Links */}
       <div className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
         <Link
-          to="/client_dashboard"
+          to="/admin-dashboard"
           className={`flex items-center px-3 py-3 rounded-xl border transition-all duration-200 ${
-            isActive('/client_dashboard')
+            isActive('/admin-dashboard')
               ? 'bg-slate-900 border-amber-400/40 text-amber-400 shadow-lg shadow-amber-400/5 font-medium'
               : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
           }`}
@@ -127,53 +129,11 @@ const DNavigation = ({ onToggleCollapse }) => {
             viewBox="0 -960 960 960" 
             width="22px" 
             fill="currentColor"
-            className={isActive('/client_dashboard') ? 'text-amber-400' : 'text-slate-400'}
+            className={isActive('/admin-dashboard') ? 'text-amber-400' : 'text-slate-400'}
           >
             <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
           </svg>
-          {!isCollapsed && <span className="ml-3 text-sm tracking-wide">Dashboard</span>}
-        </Link>
-
-        <Link
-          to="/booking"
-          className={`flex items-center px-3 py-3 rounded-xl border transition-all duration-200 ${
-            isActive('/booking')
-              ? 'bg-slate-900 border-amber-400/40 text-amber-400 shadow-lg shadow-amber-400/5 font-medium'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
-          }`}
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            height="22px" 
-            viewBox="0 -960 960 960" 
-            width="22px" 
-            fill="currentColor"
-            className={isActive('/booking') ? 'text-amber-400' : 'text-slate-400'}
-          >
-            <path d="M280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
-          </svg>
-          {!isCollapsed && <span className="ml-3 text-sm tracking-wide">Bookings</span>}
-        </Link>
-
-        <Link
-          to="/bill"
-          className={`flex items-center px-3 py-3 rounded-xl border transition-all duration-200 ${
-            isActive('/bill')
-              ? 'bg-slate-900 border-amber-400/40 text-amber-400 shadow-lg shadow-amber-400/5 font-medium'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
-          }`}
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            height="22px" 
-            viewBox="0 -960 960 960" 
-            width="22px" 
-            fill="currentColor"
-            className={isActive('/bill') ? 'text-amber-400' : 'text-slate-400'}
-          >
-            <path d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
-          </svg>
-          {!isCollapsed && <span className="ml-3 text-sm tracking-wide">Bills</span>}
+          {!isCollapsed && <span className="ml-3 text-sm tracking-wide">Admin Dashboard</span>}
         </Link>
 
         <Link
@@ -215,4 +175,4 @@ const DNavigation = ({ onToggleCollapse }) => {
   );
 };
 
-export default DNavigation;
+export default AdminNavigation;

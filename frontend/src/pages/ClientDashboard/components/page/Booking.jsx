@@ -1,24 +1,26 @@
 import { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../../../../constants";
-import DNavigation from "../../../ClientDashboard/components/DNavigation";
+import DNavigation from "../DNavigation";
 import BookingForm from "../../../../components/BookingForm";
 import BookingList from "./BookingList";
-import LoadingIndicator from "../../../../components/LoadingIndicator";
-
+import Loader from "../../../../components/Loader";
 
 
 function Booking() {
   const [logout, setLogout] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const toggleSidebar = () => {
-  setSidebarCollapsed(!sidebarCollapsed);
-};
+  // Track sidebar collapse state to apply responsive layout margin
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
 
   useEffect(() => {
     if (logout) {
-      localStorage.clear();
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
+      localStorage.removeItem('sidebarCollapsed');
       window.location.href = "/login";
     }
   }, [logout]);
@@ -46,36 +48,31 @@ function Booking() {
     }
   }, []);
 
-    return (
-        <>
-          <div className="min-h-screen bg-background">
-      <DNavigation 
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={toggleSidebar}
-        setLogout={setLogout} 
-      />
-      <main className={`${sidebarCollapsed ? 'ml-16' : 'ml-64'} p-4 transition-all duration-300`}>
-        <DashboardContent 
-          loading={loading} 
-        />
+  return (
+    <>
+      <div className="min-h-screen bg-background">
+      <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      <main 
+        className="transition-all duration-300 ease-out"
+        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+      >
+        <DashboardContent loading={loading} />
       </main>
     </div>
-        </>
-    );
+    </>
+  );
 }
 
 function DashboardContent({ loading }) {
   if (loading) {
-    return <LoadingIndicator />;
+    return <Loader.Section />;
   }
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
+    <div className="container">
       <BookingForm />
-      <BookingList />
     </div>
 
-    
   );
-};
+}
 
 export default Booking;

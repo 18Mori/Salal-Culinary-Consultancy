@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../constants';
-import LoadingIndicator from './LoadingIndicator';
 
 const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
   const navigate = useNavigate();
@@ -28,7 +27,6 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
     'Other'
   ];
 
-  // Convert 12hr to 24hr
   const convertTo24Hour = (time12h) => {
     if (!time12h) return '';
     const [time, modifier] = time12h.split(' ');
@@ -41,11 +39,7 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
   };
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    // Clear error when user types
+    setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -56,7 +50,6 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
     setIsSubmitting(true);
     setErrors({});
 
-    // Validates fields
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.serviceType) newErrors.serviceType = 'Please select a service';
@@ -84,8 +77,6 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
         notes: formData.notes.trim() || null
       };
 
-      console.log('Sending to backend:', payload);
-
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -99,22 +90,15 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
       try {
         data = await res.json();
       } catch (parseError) {
-        const text = await res.text();
-        console.error('Server returned non-JSON:', text);
-        setErrors({
-          general: 'Server returned unexpected response. Please contact support.'
-        });
+        setErrors({ general: 'Server returned unexpected response.' });
         setIsSubmitting(false);
         return;
       }
 
       if (res.ok && res.status === 201) {
-        console.log('Booking successful:', data);
         onBookingSuccess?.(data);
-        navigate('/client_index');
+        navigate('/client_dashboard');
       } else {
-        console.error('Backend error:', res.status, data);
-
         if (res.status === 401) {
           localStorage.removeItem(ACCESS_TOKEN);
           navigate('/login');
@@ -125,13 +109,10 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
             setErrors({ general: 'Invalid data. Please check your inputs.' });
           }
         } else {
-          setErrors({
-            general: `Failed to book appointment: ${data.message || 'Unknown server error'}`
-          });
+          setErrors({ general: `Failed to book appointment: ${data.message || 'Server error'}` });
         }
       }
     } catch (error) {
-      console.error('Network error:', error);
       setErrors({ general: 'Network error. Please check your connection.' });
     } finally {
       setIsSubmitting(false);
@@ -141,204 +122,214 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
   const isFormValid = formData.title && formData.serviceType && formData.date && formData.time && formData.duration;
 
   return (
-    <div className="mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
-        </svg>
-        New Booking
-      </h3>
-
-      {errors.general && <p className="text-sm text-red-500 mb-2">{errors.general}</p>}
-
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Service Type <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={formData.serviceType}
-            onChange={(e) => handleInputChange('serviceType', e.target.value)}
-            className={`w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring ${errors.serviceType ? 'border-red-500' : ''}`}
-            required
-          >
-            <option value="">Select a service</option>
-            {serviceTypes.map(service => (
-              <option key={service} value={service}>
-                {service}
-              </option>
-            ))}
-          </select>
-          {errors.serviceType && <p className="mt-1 text-sm text-red-500">{errors.serviceType}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Consultation Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => handleInputChange('title', e.target.value)}
-            placeholder="Brief description of your consultation"
-            className={`w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring ${errors.title ? 'border-red-500' : ''}`}
-            required
-          />
-          {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Session Duration <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={formData.duration}
-            onChange={(e) => handleInputChange('duration', e.target.value)}
-            className={`w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring ${errors.duration ? 'border-red-500' : ''}`}
-            required
-          >
-            <option value="">Select duration</option>
-            <option value="30">30 minutes</option>
-            <option value="45">45 minutes</option>
-            <option value="60">60 minutes</option>
-            <option value="90">90 minutes</option>
-            <option value="120">2 hours</option>
-          </select>
-          {errors.duration && <p className="mt-1 text-sm text-red-500">{errors.duration}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-3">
-            Session Type
-          </label>
-          <div className="space-y-2">
-            <label className="flex items-center space-x-3">
-              <input
-                type="radio"
-                name="sessionType"
-                value="video"
-                checked={formData.type === 'video'}
-                onChange={(e) => handleInputChange('type', e.target.value)}
-                className="w-4 h-4"
-              />
-              <span className="text-sm">Video Call</span>
-              <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </label>
-            <label className="flex items-center space-x-3">
-              <input
-                type="radio"
-                name="sessionType"
-                value="in-person"
-                checked={formData.type === 'in-person'}
-                onChange={(e) => handleInputChange('type', e.target.value)}
-                className="w-4 h-4"
-              />
-              <span className="text-sm">In-Person</span>
-              <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </label>
-            <label className="flex items-center space-x-3">
-              <input
-                type="radio"
-                name="sessionType"
-                value="phone"
-                checked={formData.type === 'phone'}
-                onChange={(e) => handleInputChange('type', e.target.value)}
-                className="w-4 h-4"
-              />
-              <span className="text-sm">Phone Call</span>
-              <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-            </label>
+    /* Outer Container: Clean Pure White Background */
+    <div className="min-h-screen w-full bg-white flex items-center justify-center p-4 sm:p-8 font-sans text-slate-900">
+      
+      {/* Form Card Container: White Card with Soft Border & Delicate Shadow */}
+      <div className="w-full max-w-xl bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-100 p-6 sm:p-10">
+        
+        {/* Morning Header */}
+        <div className="relative mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center gap-4 pb-6 border-b border-slate-100">
+          <div className="w-14 h-14 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm shrink-0">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Schedule Consultation</h2>
+            <p className="text-xs sm:text-sm text-slate-500 font-normal mt-0.5">Select your parameters and reserve your morning or afternoon session.</p>
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Notes
-          </label>
-          <textarea
-            value={formData.notes}
-            onChange={(e) => handleInputChange('notes', e.target.value)}
-            placeholder="(Optional) Any specific topics, materials needed, or preparation requirements..."
-            rows={3}
-            className="w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
+        {errors.general && (
+          <div className="mb-6 p-3.5 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-xs text-center font-medium">
+            {errors.general}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Date <span className="text-red-500">*</span>
+            <label className="block text-xs uppercase tracking-wider text-slate-700 font-bold mb-2">
+              Consultation Title <span className="text-red-500">*</span>
             </label>
             <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => handleInputChange('date', e.target.value)}
-              className={`w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring ${errors.date ? 'border-red-500' : ''}`}
+              type="text"
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              placeholder="e.g. Kitchen Operations Review"
+              className={`w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                errors.title ? 'border-red-400 focus:ring-red-200' : 'border-slate-200 focus:border-amber-500 focus:ring-amber-100'
+              }`}
               required
-              min={new Date().toISOString().split('T')[0]}
             />
-            {errors.date && <p className="mt-1 text-sm text-red-500">{errors.date}</p>}
+            {errors.title && <p className="mt-1.5 text-xs text-red-500">{errors.title}</p>}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Time <span className="text-red-500">*</span>
-            </label>
-            {selectedTimeSlot ? (
-              <div className="h-10 px-3 py-2 text-sm border border-input bg-muted rounded-md flex items-center cursor-not-allowed text-muted-foreground">
-                {formData.time}
-              </div>
-            ) : (
+          {/* Service Type & Duration Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-slate-700 font-bold mb-2">
+                Service Type <span className="text-red-500">*</span>
+              </label>
               <select
-                value={formData.time}
-                onChange={(e) => handleInputChange('time', e.target.value)}
-                className={`w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring ${errors.time ? 'border-red-500' : ''}`}
+                value={formData.serviceType}
+                onChange={(e) => handleInputChange('serviceType', e.target.value)}
+                className={`w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                  errors.serviceType ? 'border-red-400 focus:ring-red-200' : 'border-slate-200 focus:border-amber-500 focus:ring-amber-100'
+                }`}
                 required
               >
-                <option value="">Select time</option>
-                <option value="9:00 AM">9:00 AM</option>
-                <option value="10:00 AM">10:00 AM</option>
-                <option value="11:00 AM">11:00 AM</option>
-                <option value="1:00 PM">1:00 PM</option>
-                <option value="2:00 PM">2:00 PM</option>
-                <option value="3:00 PM">3:00 PM</option>
-                <option value="4:00 PM">4:00 PM</option>
+                <option value="" disabled className="text-slate-400">Select service</option>
+                {serviceTypes.map(service => (
+                  <option key={service} value={service} className="text-slate-900">
+                    {service}
+                  </option>
+                ))}
               </select>
-            )}
-            {errors.time && <p className="mt-1 text-sm text-red-500">{errors.time}</p>}
-          </div>
-        </div>
+              {errors.serviceType && <p className="mt-1.5 text-xs text-red-500">{errors.serviceType}</p>}
+            </div>
 
-        <div className="flex gap-3 pt-4">
-          <button
-            type="submit"
-            disabled={!isFormValid || isSubmitting}
-            className={`bg-slate-600 flex-1 h-10 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 ${
-              !isFormValid || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {isSubmitting ? (
-              <>
-                <LoadingIndicator size="sm" />
-                Booking...
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                Book Consultation
-              </>
-            )}
-          </button>
-        </div>
-      </form>
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-slate-700 font-bold mb-2">
+                Duration <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.duration}
+                onChange={(e) => handleInputChange('duration', e.target.value)}
+                className={`w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                  errors.duration ? 'border-red-400 focus:ring-red-200' : 'border-slate-200 focus:border-amber-500 focus:ring-amber-100'
+                }`}
+                required
+              >
+                <option value="30">30 minutes</option>
+                <option value="45">45 minutes</option>
+                <option value="60">60 minutes</option>
+                <option value="90">90 minutes</option>
+                <option value="120">2 hours</option>
+              </select>
+              {errors.duration && <p className="mt-1.5 text-xs text-red-500">{errors.duration}</p>}
+            </div>
+          </div>
+
+          {/* Custom Segmented Session Type */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-slate-700 font-bold mb-2">
+              Session Format
+            </label>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {[
+                { id: 'video', label: 'Video', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+                { id: 'in-person', label: 'In-Person', icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' },
+                { id: 'phone', label: 'Phone', icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' }
+              ].map((type) => (
+                <button
+                  key={type.id}
+                  type="button"
+                  onClick={() => handleInputChange('type', type.id)}
+                  className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+                    formData.type === type.id
+                      ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-sm'
+                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  }`}
+                >
+                  <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={type.icon} />
+                  </svg>
+                  <span className="text-xs font-semibold">{type.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Date and Time Pickers */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-slate-700 font-bold mb-2">
+                Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                value={formData.date}
+                onChange={(e) => handleInputChange('date', e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className={`w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                  errors.date ? 'border-red-400 focus:ring-red-200' : 'border-slate-200 focus:border-amber-500 focus:ring-amber-100'
+                }`}
+                required
+              />
+              {errors.date && <p className="mt-1.5 text-xs text-red-500">{errors.date}</p>}
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-slate-700 font-bold mb-2">
+                Time Slot <span className="text-red-500">*</span>
+              </label>
+              {selectedTimeSlot ? (
+                <div className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-700 flex items-center justify-between cursor-not-allowed">
+                  <span className="font-medium">{formData.time}</span>
+                  <span className="text-[10px] uppercase tracking-wider font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200">Locked</span>
+                </div>
+              ) : (
+                <select
+                  value={formData.time}
+                  onChange={(e) => handleInputChange('time', e.target.value)}
+                  className={`w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                    errors.time ? 'border-red-400 focus:ring-red-200' : 'border-slate-200 focus:border-amber-500 focus:ring-amber-100'
+                  }`}
+                  required
+                >
+                  <option value="" disabled className="text-slate-400">Select time</option>
+                  <option value="9:00 AM">9:00 AM (Morning)</option>
+                  <option value="10:00 AM">10:00 AM (Morning)</option>
+                  <option value="11:00 AM">11:00 AM (Morning)</option>
+                  <option value="1:00 PM">1:00 PM (Afternoon)</option>
+                  <option value="2:00 PM">2:00 PM (Afternoon)</option>
+                  <option value="3:00 PM">3:00 PM (Afternoon)</option>
+                  <option value="4:00 PM">4:00 PM (Afternoon)</option>
+                </select>
+              )}
+              {errors.time && <p className="mt-1.5 text-xs text-red-500">{errors.time}</p>}
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-slate-700 font-bold mb-2">
+              Session Details <span className="text-slate-400 lowercase font-normal">(optional)</span>
+            </label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => handleInputChange('notes', e.target.value)}
+              placeholder="Key discussion topics, questions, or preliminary details..."
+              rows={3}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all resize-none"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={!isFormValid || isSubmitting}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3.5 px-6 rounded-2xl font-semibold tracking-wide transition-all shadow-lg shadow-amber-500/25 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <span>Confirming Booking...</span>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <span>Book Consultation</span>
+                </>
+              )}
+            </button>
+          </div>
+
+        </form>
+      </div>
     </div>
   );
 };

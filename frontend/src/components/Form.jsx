@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
-import { Link } from 'react-router-dom';
-import LoadingIndicator from './LoadingIndicator';
 
 function Form({ route, method }) {
   const navigate = useNavigate();
@@ -12,7 +10,12 @@ function Form({ route, method }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [passFeedback, setPassFeedback] = useState({
+  
+  // Password Visibility Toggle State
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+
+  const [setPassFeedback] = useState({
     length: false,
     letter: false,
     number: false,
@@ -136,16 +139,28 @@ function Form({ route, method }) {
 
       const data = await res.json();
 
-      // Handle server-side errors
+      // Handle serverside errors
       if (!res.ok) {
-        if (data.username) setErrors((prev) => ({ ...prev, username: data.username[0] }));
-        if (data.email) setErrors((prev) => ({ ...prev, email: data.email[0] }));
-        if (data.first_name) setErrors((prev) => ({ ...prev, firstName: data.first_name[0] }));
-        if (data.last_name) setErrors((prev) => ({ ...prev, lastName: data.last_name[0] }));
-        if (data.password) setErrors((prev) => ({ ...prev, password: data.password[0] }));
-        if (data.password_confirm) setErrors((prev) => ({ ...prev, passwordConfirm: data.password_confirm[0] }));
-        if (data.non_field_errors) setErrors((prev) => ({ ...prev, general: data.non_field_errors[0] }));
-        else setErrors((prev) => ({ ...prev, general: 'Registration/Login failed. Please try again.' }));
+        const newErrors = {};
+        if (data.username) newErrors.username = Array.isArray(data.username) ? data.username[0] : data.username;
+        if (data.email) newErrors.email = Array.isArray(data.email) ? data.email[0] : data.email;
+        if (data.first_name) newErrors.firstName = Array.isArray(data.first_name) ? data.first_name[0] : data.first_name;
+        if (data.last_name) newErrors.lastName = Array.isArray(data.last_name) ? data.last_name[0] : data.last_name;
+        if (data.password) newErrors.password = Array.isArray(data.password) ? data.password[0] : data.password;
+        if (data.password_confirm) newErrors.passwordConfirm = Array.isArray(data.password_confirm) ? data.password_confirm[0] : data.password_confirm;
+        if (data.non_field_errors) newErrors.general = Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors;
+        if (data.detail) newErrors.general = data.detail;
+
+        if (Object.keys(newErrors).length === 0) {
+          const firstKey = Object.keys(data)[0];
+          if (firstKey && data[firstKey]) {
+            const errVal = data[firstKey];
+            newErrors.general = Array.isArray(errVal) ? errVal[0] : errVal;
+          } else {
+            newErrors.general = 'Registration/Login failed. Please try again.';
+          }
+        }
+        setErrors(newErrors);
         return;
       }
 
@@ -153,8 +168,30 @@ function Form({ route, method }) {
       localStorage.setItem(ACCESS_TOKEN, data.access);
       localStorage.setItem(REFRESH_TOKEN, data.refresh);
 
-      if (data.user) {
-        navigate('/client_index');
+      // --- DYNAMIC ROLE DETECTION & ROUTING ---
+      let isAdmin = false;
+
+      const userObj = data.user || data;
+      if (userObj.is_staff || userObj.is_superuser || userObj.role === 'admin') {
+        isAdmin = true;
+      }
+
+      if (!isAdmin && data.access) {
+        try {
+          const payloadBase64 = data.access.split('.')[1];
+          const decodedPayload = JSON.parse(atob(payloadBase64));
+          if (decodedPayload.is_staff || decodedPayload.is_superuser || decodedPayload.role === 'admin') {
+            isAdmin = true;
+          }
+        } catch (jwtError) {
+          console.error('Failed to parse token payload:', jwtError);
+        }
+      }
+
+      if (isAdmin) {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/client_dashboard');
       }
     } catch (error) {
       console.error('Network error:', error);
@@ -177,74 +214,80 @@ function Form({ route, method }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 font-sans text-slate-100">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-slate-900/60 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-800/80 p-8">
+          
+          {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <img src="chef-hat.png" alt="Chef Hat" className="w-14 h-14" />
+            <div className="w-16 h-16 bg-amber-400/10 border border-amber-400/20 rounded-2xl flex items-center justify-center mx-auto mb-4 p-3 shadow-lg shadow-amber-400/5">
+              <img className="w-full h-full object-contain filter invert opacity-90" src="chef-hat.png" alt="Chef Hat" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-light text-white tracking-wide mb-2">
               {method === 'login' ? 'Welcome Back' : 'Create Your Account'}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-sm text-slate-400 font-light">
               {method === 'login'
                 ? 'Sign in to access your culinary consultancy portal'
                 : 'Join Salal Culinary Consultancy to access expert guidance and resources'}
             </p>
           </div>
 
+          {/* General Error Banner */}
           {errors.general && (
-            <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            <div className="mb-6 p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-sm text-center">
               {errors.general}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             {method === 'register' && (
               <>
-                <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
-                  </label>
-                  <input
-                    id="firstName"
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Enter your first name"
-                    autoComplete="given-name"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                      errors.firstName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
-                    }`}
-                  />
-                  {errors.firstName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
-                  )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="firstName" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                      First Name
+                    </label>
+                    <input
+                      id="firstName"
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="Jane"
+                      autoComplete="given-name"
+                      className={`w-full px-4 py-2.5 bg-slate-950/80 border rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                        errors.firstName ? 'border-rose-500/60 focus:ring-rose-500' : 'border-slate-800/80 focus:border-amber-400/60 focus:ring-amber-400/30'
+                      }`}
+                    />
+                    {errors.firstName && (
+                      <p className="mt-1 text-xs text-rose-400">{errors.firstName}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="lastName" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                      Last Name
+                    </label>
+                    <input
+                      id="lastName"
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder="Doe"
+                      autoComplete="family-name"
+                      className={`w-full px-4 py-2.5 bg-slate-950/80 border rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                        errors.lastName ? 'border-rose-500/60 focus:ring-rose-500' : 'border-slate-800/80 focus:border-amber-400/60 focus:ring-amber-400/30'
+                      }`}
+                    />
+                    {errors.lastName && (
+                      <p className="mt-1 text-xs text-rose-400">{errors.lastName}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
-                  </label>
-                  <input
-                    id="lastName"
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Enter your last name"
-                    autoComplete="family-name"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                      errors.lastName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
-                    }`}
-                  />
-                  {errors.lastName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="email" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
                     Email
                   </label>
                   <input
@@ -254,132 +297,232 @@ function Form({ route, method }) {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     autoComplete="email"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                      errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
+                    className={`w-full px-4 py-2.5 bg-slate-950/80 border rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                      errors.email ? 'border-rose-500/60 focus:ring-rose-500' : 'border-slate-800/80 focus:border-amber-400/60 focus:ring-amber-400/30'
                     }`}
                   />
                   {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                    <p className="mt-1 text-xs text-rose-400">{errors.email}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="username" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="janedoe"
+                    autoComplete="username"
+                    autoFocus
+                    className={`w-full px-4 py-2.5 bg-slate-950/80 border rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                      errors.username ? 'border-rose-500/60 focus:ring-rose-500' : 'border-slate-800/80 focus:border-amber-400/60 focus:ring-amber-400/30'
+                    }`}
+                  />
+                  {errors.username && (
+                    <p className="mt-1 text-xs text-rose-400">{errors.username}</p>
+                  )}
+                </div>
+
+                {/* Registration Password Input */}
+                <div>
+                  <label htmlFor="password" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={handlePasswordChange}
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                      className={`w-full pl-4 pr-11 py-2.5 bg-slate-950/80 border rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                        errors.password ? 'border-rose-500/60 focus:ring-rose-500' : 'border-slate-800/80 focus:border-amber-400/60 focus:ring-amber-400/30'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a8.962 8.962 0 012.122-.363c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21f-9-9m-6-6l-6 6" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="mt-1 text-xs text-rose-400">{errors.password}</p>
+                  )}
+                </div>
+
+                {/* Confirm Password Input */}
+                <div>
+                  <label htmlFor="passwordConfirm" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="passwordConfirm"
+                      type={showPasswordConfirm ? 'text' : 'password'}
+                      value={passwordConfirm}
+                      onChange={(e) => setPasswordConfirm(e.target.value)}
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                      className={`w-full pl-4 pr-11 py-2.5 bg-slate-950/80 border rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                        errors.passwordConfirm ? 'border-rose-500/60 focus:ring-rose-500' : 'border-slate-800/80 focus:border-amber-400/60 focus:ring-amber-400/30'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1"
+                      aria-label={showPasswordConfirm ? 'Hide password' : 'Show password'}
+                    >
+                      {showPasswordConfirm ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a8.962 8.962 0 012.122-.363c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21f-9-9m-6-6l-6 6" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {errors.passwordConfirm && (
+                    <p className="mt-1 text-xs text-rose-400">{errors.passwordConfirm}</p>
                   )}
                 </div>
               </>
             )}
 
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Username
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                autoComplete="username"
-                autoFocus
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                  errors.username ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
-                }`}
-              />
-              {errors.username && (
-                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-              )}
-            </div>
+            {method === 'login' && (
+              <>
+                <div>
+                  <label htmlFor="username" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Username"
+                    autoComplete="username"
+                    autoFocus
+                    className={`w-full px-4 py-2.5 bg-slate-950/80 border rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                      errors.username ? 'border-rose-500/60 focus:ring-rose-500' : 'border-slate-800/80 focus:border-amber-400/60 focus:ring-amber-400/30'
+                    }`}
+                  />
+                  {errors.username && (
+                    <p className="mt-1 text-xs text-rose-400">{errors.username}</p>
+                  )}
+                </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={handlePasswordChange}
-                placeholder="Password"
-                autoComplete="new-password"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                  errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
-                }`}
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-              )}
-            </div>
-
-            {method === 'register' && (
-              <div>
-                <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700 mb-1">
-                  Confirm Password
-                </label>
-                <input
-                  id="passwordConfirm"
-                  type="password"
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  placeholder="Confirm your password"
-                  autoComplete="new-password"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition ${
-                    errors.passwordConfirm ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'
-                  }`}
-                />
-                {errors.passwordConfirm && (
-                  <p className="mt-1 text-sm text-red-600">{errors.passwordConfirm}</p>
-                )}
-              </div>
+                {/* Login Password Input */}
+                <div>
+                  <label htmlFor="password" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={handlePasswordChange}
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                      className={`w-full pl-4 pr-11 py-2.5 bg-slate-950/80 border rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                        errors.password ? 'border-rose-500/60 focus:ring-rose-500' : 'border-slate-800/80 focus:border-amber-400/60 focus:ring-amber-400/30'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a8.962 8.962 0 012.122-.363c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21f-9-9m-6-6l-6 6" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="mt-1 text-xs text-rose-400">{errors.password}</p>
+                  )}
+                </div>
+              </>
             )}
 
+            {/* Action Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full mt-2 bg-amber-400 hover:bg-amber-300 text-slate-950 py-3 px-4 rounded-xl font-medium tracking-wide transition-all shadow-lg shadow-amber-400/10 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 " fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
-                  {name}...
-                </>
+                <span>{name}...</span>
               ) : (
                 <>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    height="24"
+                    height="20"
                     viewBox="0 -960 960 960"
-                    width="24"
+                    width="20"
                     fill="currentColor"
-                    className="w-5 h-5"
                   >
                     <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z" />
                   </svg>
-                  {name}
+                  <span>{name}</span>
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          {/* Footer Links */}
+          <div className="mt-8 pt-6 border-t border-slate-800/80 text-center">
             {method === 'login' ? (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-400 font-light">
                 Don't have an account?{' '}
-                <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link to="/register" className="font-medium text-amber-400 hover:text-amber-300 transition-colors">
                   Register
                 </Link>
               </p>
             ) : (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-400 font-light">
                 Already have an account?{' '}
-                <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      Login
-                    </Link>
+                <Link to="/login" className="font-medium text-amber-400 hover:text-amber-300 transition-colors">
+                  Login
+                </Link>
               </p>
             )}
-            <p className="mt-2 text-sm text-gray-500">
-              <Link to="/" className="hover:text-gray-700">← Back to Home
+            <p className="mt-3 text-sm">
+              <Link to="/" className="text-slate-500 hover:text-slate-300 transition-colors">
+                ← Back to Home
               </Link>
             </p>
           </div>
+
         </div>
       </div>
     </div>
