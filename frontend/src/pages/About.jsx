@@ -162,7 +162,7 @@ const About = () => {
           </p>
           <div className="pt-2">
             <button
-              onClick={() => navigate(isAuthenticated ? '/client_index' : '/login')}
+              onClick={() => navigate(isAuthenticated ? '/client_dashboard' : '/login')}
               className="px-8 py-4 bg-amber-400 text-slate-950 rounded-xl font-semibold hover:bg-amber-300 transition-all duration-300 shadow-lg shadow-amber-400/10"
             >
               {isAuthenticated ? 'Go to Dashboard' : 'Login to Get Started'}

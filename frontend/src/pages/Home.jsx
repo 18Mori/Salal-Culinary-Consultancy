@@ -37,7 +37,7 @@ function Home() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <button
-                  onClick={() => (window.location.href = "/book")}
+                  onClick={() => (window.location.href = "/booking")}
                   className="px-8 py-4 rounded-xl bg-amber-400 text-slate-950 font-semibold hover:bg-amber-300 transition-all duration-300 shadow-lg shadow-amber-400/20 active:scale-[0.98]"
                 >
                   Book a Consultation
@@ -53,7 +53,7 @@ function Home() {
               {isAuthenticated && (
                 <div className="pt-2">
                   <button
-                    onClick={() => (window.location.href = "/client_index")}
+                    onClick={() => (window.location.href = "/client_dashboard")}
                     className="inline-flex items-center text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors gap-2"
                   >
                     Go to Client Portal &rarr;
@@ -213,7 +213,7 @@ function Home() {
           </p>
           <div>
             <button
-              onClick={() => (window.location.href = isAuthenticated ? "/client_index" : "/login")}
+              onClick={() => (window.location.href = isAuthenticated ? "/client_dashboard" : "/login")}
               className="px-10 py-4 rounded-xl bg-amber-400 text-slate-950 font-semibold hover:bg-amber-300 transition-all duration-300 shadow-xl shadow-amber-400/10"
             >
               {isAuthenticated ? "Access Client Dashboard" : "Schedule Consultation"}

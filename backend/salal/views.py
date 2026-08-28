@@ -79,6 +79,7 @@ class AdminBookingsView(APIView):
         for booking in bookings:
             data.append({
                 'id': booking.pk,
+                'client_id': booking.client.pk,
                 'client_username': booking.client.username,
                 'client_email': booking.client.email,
                 'booking_title': booking.title,
@@ -99,13 +100,9 @@ class AdminBookingUpdateView(APIView):
     def patch(self, request, pk):
         try:
             booking = Booking.objects.get(pk=pk)
-            assigned_chef = request.data.get('assigned_chef')
-            status_val = request.data.get('status')
-            if assigned_chef is not None:
-                booking.assigned_chef = assigned_chef
-            if status_val is not None:
-                booking.status = status_val
-            booking.save()
+            serializer = BookingSerializer(booking, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response({
                 'id': booking.pk,
                 'assigned_chef': booking.assigned_chef,
@@ -244,6 +241,9 @@ class LoginView(APIView):
                     'first_name': user.first_name,
                     'last_name': user.last_name,
                     'email': user.email, 
+                    'is_staff': user.is_staff,
+                    'is_superuser': user.is_superuser,
+                    'role': user.role,
                 }
             }, status=status.HTTP_200_OK)
         except Exception as e:
@@ -272,10 +272,13 @@ class RegisterView(APIView):
                     'refresh': str(refresh),
                     'user': {
                         'id': user.pk,
-                        'firstname': user.first_name,
-                        'lastname': user.last_name,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
                         'email': user.email,
                         'username': user.username,
+                        'is_staff': user.is_staff,
+                        'is_superuser': user.is_superuser,
+                        'role': user.role,
                     }
                 }, status=status.HTTP_201_CREATED)
                 
@@ -295,4 +298,7 @@ def user_detail(request):
         'first_name': request.user.first_name,
         'last_name': request.user.last_name, 
         'email': request.user.email,
+        'is_staff': request.user.is_staff,
+        'is_superuser': request.user.is_superuser,
+        'role': request.user.role,
     })

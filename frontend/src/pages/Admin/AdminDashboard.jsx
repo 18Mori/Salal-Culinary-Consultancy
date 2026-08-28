@@ -4,7 +4,7 @@ import Loader from '../../components/Loader';
 import { ACCESS_TOKEN } from '../../constants';
 
 // --- Activity Helper Calculations ---
-const ACTIVE_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes activity window
+const ACTIVE_THRESHOLD_MS = 120 * 1000; // 120 seconds (2 minutes) activity window - matches backend
 
 const formatTimeAgo = (diffMs) => {
   const seconds = Math.floor(diffMs / 1000);
@@ -21,7 +21,8 @@ const formatTimeAgo = (diffMs) => {
 
 const calculateUserStatus = (activeStatus, lastLogin, lastSeen) => {
   // 1. Explicit dynamic status string sent directly by backend endpoint
-  if (activeStatus === 'Active now' || activeStatus === 'Active Now') {
+  // Only "Active now" (exact match) counts as currently active
+  if (activeStatus === 'Active now') {
     return {
       label: 'Active Now',
       badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -29,7 +30,8 @@ const calculateUserStatus = (activeStatus, lastLogin, lastSeen) => {
     };
   }
 
-  if (activeStatus && activeStatus.includes('Active') && !activeStatus.includes('Inactive')) {
+  // Historical statuses (e.g., "Active 5m ago", "Active 3d ago") are NOT active now
+  if (activeStatus && activeStatus.startsWith('Active') && activeStatus !== 'Active now') {
     return {
       label: activeStatus,
       badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -37,7 +39,16 @@ const calculateUserStatus = (activeStatus, lastLogin, lastSeen) => {
     };
   }
 
+  if (activeStatus === 'Inactive') {
+    return {
+      label: 'Inactive',
+      badgeClass: 'bg-gray-100 text-gray-600 border-gray-300',
+      dotClass: 'bg-gray-400'
+    };
+  }
+
   // 2. Client-side evaluation using last_seen or last_login timestamps
+  // Fallback for missing/malformed timestamp data
   const timestampToEvaluate = lastSeen || lastLogin;
   if (!timestampToEvaluate) {
     return {
@@ -48,8 +59,16 @@ const calculateUserStatus = (activeStatus, lastLogin, lastSeen) => {
   }
 
   const timeMs = new Date(timestampToEvaluate).getTime();
+  if (isNaN(timeMs)) {
+    return {
+      label: 'Invalid Timestamp',
+      badgeClass: 'bg-gray-100 text-gray-600 border-gray-300',
+      dotClass: 'bg-gray-400'
+    };
+  }
+
   const diffMs = Date.now() - timeMs;
-  const isOnline = !isNaN(timeMs) && diffMs >= 0 && diffMs <= ACTIVE_THRESHOLD_MS;
+  const isOnline = diffMs >= 0 && diffMs <= ACTIVE_THRESHOLD_MS;
 
   return {
     label: isOnline ? 'Active Now' : formatTimeAgo(diffMs),
@@ -300,9 +319,10 @@ const AdminDashboard = () => {
   };
 
   // Evaluate count of active users currently logged in / active in window
+  // Only count users with exact "Active Now" status (120-second threshold or explicit "Active now" from backend)
   const activeClientsCount = clients.filter(c => {
     const statusObj = calculateUserStatus(c.active_status, c.last_login, c.last_seen);
-    return statusObj.label === 'Active Now' || statusObj.label.includes('Active');
+    return statusObj.label === 'Active Now';
   }).length;
 
   const assignedChefsCount = new Set(bookings.map(b => b.assigned_chef).filter(Boolean)).size;

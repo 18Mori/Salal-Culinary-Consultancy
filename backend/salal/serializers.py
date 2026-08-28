@@ -69,8 +69,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     client_username = serializers.CharField(source='client.username', read_only=True)
+    assigned_chef = serializers.ChoiceField(choices=Booking.CHEFS, allow_blank=True, required=False)
+    status = serializers.ChoiceField(choices=Booking.STATUS_CHOICES, required=False)
     
     class Meta:
         model = Booking
-        fields = ['id', 'client', 'client_username', 'title', 'date', 'time', 'notes', 'duration', 'service_type', 'created_at', 'updated_at', 'session_type']
+        fields = ['id', 'client', 'client_username', 'title', 'date', 'time', 'notes', 'duration', 'service_type', 'created_at', 'updated_at', 'session_type', 'assigned_chef', 'status']
         read_only_fields = ['id', 'created_at', 'client_username']

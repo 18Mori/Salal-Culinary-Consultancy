@@ -1,5 +1,5 @@
 import react from "react"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import ClientDashboard from "./pages/ClientDashboard/client_index"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -59,6 +59,7 @@ function App() {
             </MainLayout>
           }
         />
+        <Route path="/client_index" element={<Navigate to="/client_dashboard" replace />} />
         <Route
           path="/booking"
           element={

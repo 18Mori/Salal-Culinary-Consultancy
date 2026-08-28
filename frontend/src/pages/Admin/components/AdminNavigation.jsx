@@ -20,7 +20,9 @@ const AdminNavigation = ({ onToggleCollapse }) => {
       }
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/`, {
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+        const cleanUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+        const res = await fetch(`${cleanUrl}/api/user/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

@@ -103,7 +103,7 @@ function Services() {
           </p>
           <div className="pt-4">
             <button
-              onClick={() => window.location.href = '/book'}
+              onClick={() => window.location.href = '/booking'}
               className="px-8 py-4 bg-amber-400 text-slate-950 rounded-xl font-semibold hover:bg-amber-300 transition-all shadow-lg shadow-amber-400/10"
             >
               Schedule Consultation
