@@ -27,7 +27,7 @@ const CulinaryStyles = () => (
 );
 
 // Fullscreen Culinary Overlay Loader Component
-export const CulinaryLoader = ({ message = "Crafting your culinary experience..." }) => {
+export const CulinaryLoader = ({ message = "Crafting your culinary experience" }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xl p-4">
       <CulinaryStyles />
@@ -87,14 +87,14 @@ export const CulinaryLoader = ({ message = "Crafting your culinary experience...
 
 // Compatible Wrapper Object matching your exact original export keys
 const SkeletonLoader = {
-  Card: () => <CulinaryLoader message="Preparing menu analytics..." />,
-  Avatar: () => <CulinaryLoader message="Loading chef profile..." />,
-  Paragraph: () => <CulinaryLoader message="Plating content..." />,
-  Text: () => <CulinaryLoader message="Consulting recipes..." />,
-  TableRow: () => <CulinaryLoader message="Fetching bookings..." />,
-  Image: () => <CulinaryLoader message="Loading culinary media..." />,
-  Section: () => <CulinaryLoader message="Setting up consultancy suite..." />,
-  Heading: () => <CulinaryLoader message="Preparing section..." />,
+  Card: () => <CulinaryLoader message="Preparing menu analytics" />,
+  Avatar: () => <CulinaryLoader message="Loading chef profile" />,
+  Paragraph: () => <CulinaryLoader message="Plating content" />,
+  Text: () => <CulinaryLoader message="Consulting recipes" />,
+  TableRow: () => <CulinaryLoader message="Fetching bookings" />,
+  Image: () => <CulinaryLoader message="Loading culinary media" />,
+  Section: () => <CulinaryLoader message="Setting up consultancy suite" />,
+  Heading: () => <CulinaryLoader message="Preparing section" />,
 };
 
 export default SkeletonLoader;

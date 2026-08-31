@@ -384,19 +384,19 @@ const AdminDashboard = () => {
           {/* Key Metric Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase">Total Clients</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase">Total Client(s)</p>
               <h3 className="text-2xl font-bold text-gray-800 mt-1">{clients.length}</h3>
             </div>
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase">Consultations</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase">Consultation(s)</p>
               <h3 className="text-2xl font-bold text-gray-800 mt-1">{bookings.length}</h3>
             </div>
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase">Assigned Chefs</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase">Assigned Chef(s)</p>
               <h3 className="text-2xl font-bold text-gray-800 mt-1">{assignedChefsCount}</h3>
             </div>
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase">Active Sessions</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase">Active Session(s)</p>
               <h3 className="text-2xl font-bold text-emerald-600 mt-1">{activeClientsCount}</h3>
             </div>
           </div>
@@ -421,7 +421,7 @@ const AdminDashboard = () => {
                         <div>
                           <p className="text-sm font-semibold text-gray-800">{chef}</p>
                           <p className="text-xs text-gray-500">
-                            {assignedCount > 0 ? `${assignedCount} Active Assignment(s)` : 'Available'}
+                            {assignedCount > 0 ? `${assignedCount} Active Assignment((s))` : 'Available'}
                           </p>
                         </div>
                         <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${

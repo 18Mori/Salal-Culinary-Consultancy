@@ -39,10 +39,10 @@ const About = () => {
                 Our <span className="font-serif italic text-slate-300">Mission</span>
               </h2>
               <p className="text-slate-400 text-lg leading-relaxed font-light">
-                To empower culinary businesses with actionable insights, proven strategies, and hands-on support that drive profitability, compliance, and excellence[cite: 3].
+                To empower culinary businesses with actionable insights, proven strategies, and hands on support that drive profitability, compliance, and excellence.
               </p>
               <p className="text-slate-400 text-lg leading-relaxed font-light">
-                From fine dining venues to large-scale catering operations, we partner with teams to eliminate inefficiencies and scale sustainably[cite: 3].
+                From fine dining venues to large scale catering operations, we partner with teams to eliminate inefficiencies and scale sustainably.
               </p>
             </div>
             <div className="relative">
@@ -76,7 +76,7 @@ const About = () => {
               </div>
               <h3 className="text-xl font-medium text-white mb-2">Excellence</h3>
               <p className="text-slate-400 font-light text-sm leading-relaxed">
-                We hold ourselves to the highest standards — because your business deserves nothing less[cite: 3].
+                We hold ourselves to the highest standards — because your business deserves nothing less.
               </p>
             </div>
 
@@ -88,7 +88,7 @@ const About = () => {
               </div>
               <h3 className="text-xl font-medium text-white mb-2">Integrity</h3>
               <p className="text-slate-400 font-light text-sm leading-relaxed">
-                Honest advice, transparent pricing, and long-term partnerships built on trust[cite: 3].
+                Honest advice, transparent pricing, and long term partnerships built on trust.
               </p>
             </div>
 
@@ -100,7 +100,7 @@ const About = () => {
               </div>
               <h3 className="text-xl font-medium text-white mb-2">Growth</h3>
               <p className="text-slate-400 font-light text-sm leading-relaxed">
-                We don't just solve immediate issues — we optimize structure so your kitchen thrives at scale[cite: 3].
+                We don't just solve immediate issues — we optimize structure so your kitchen thrives at scale.
               </p>
             </div>
           </div>

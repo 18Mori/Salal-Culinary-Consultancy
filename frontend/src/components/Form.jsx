@@ -168,25 +168,10 @@ function Form({ route, method }) {
       localStorage.setItem(ACCESS_TOKEN, data.access);
       localStorage.setItem(REFRESH_TOKEN, data.refresh);
 
-      // --- DYNAMIC ROLE DETECTION & ROUTING ---
-      let isAdmin = false;
-
+      // --- UNIFIED ROLE DETECTION & ROUTING ---
+      // Backend now guarantees role === 'admin' <=> is_staff === true
       const userObj = data.user || data;
-      if (userObj.is_staff || userObj.is_superuser || userObj.role === 'admin') {
-        isAdmin = true;
-      }
-
-      if (!isAdmin && data.access) {
-        try {
-          const payloadBase64 = data.access.split('.')[1];
-          const decodedPayload = JSON.parse(atob(payloadBase64));
-          if (decodedPayload.is_staff || decodedPayload.is_superuser || decodedPayload.role === 'admin') {
-            isAdmin = true;
-          }
-        } catch (jwtError) {
-          console.error('Failed to parse token payload:', jwtError);
-        }
-      }
+      const isAdmin = userObj.role === 'admin' && userObj.is_staff === true;
 
       if (isAdmin) {
         navigate('/admin-dashboard');
