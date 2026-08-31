@@ -168,14 +168,17 @@ function Form({ route, method }) {
       localStorage.setItem(ACCESS_TOKEN, data.access);
       localStorage.setItem(REFRESH_TOKEN, data.refresh);
 
-      // --- UNIFIED ROLE DETECTION & ROUTING ---
-      // Backend now guarantees role === 'admin' <=> is_staff === true
+      // Save role info for persistent auth state
       const userObj = data.user || data;
       const isAdmin = userObj.role === 'admin' && userObj.is_staff === true;
-
       if (isAdmin) {
+        localStorage.setItem("is_admin", "true");
+        localStorage.setItem("user_role", "admin");
         navigate('/admin-dashboard');
       } else {
+        localStorage.setItem("is_admin", "false");
+        // Store the actual role even for non-admins so homeNav can display correctly
+        localStorage.setItem("user_role", userObj.role || "client");
         navigate('/client_dashboard');
       }
     } catch (error) {

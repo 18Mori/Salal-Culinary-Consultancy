@@ -25,7 +25,7 @@ class UserHeartbeatView(APIView):
     def post(self, request):
         user = request.user
         user.last_seen = timezone.now()
-        user.save(update_fields=['last_seen'])
+        user.save(update_fields=['last_seen', 'is_staff', 'is_superuser', 'role'])
         return Response({'status': 'active', 'last_seen': user.last_seen}, status=status.HTTP_200_OK)
 
 
@@ -153,7 +153,7 @@ class ClientDashboardView(APIView):
         
         # Keep user active while accessing dashboard
         user.last_seen = timezone.now()
-        user.save(update_fields=['last_seen'])
+        user.save(update_fields=['last_seen', 'is_staff', 'is_superuser', 'role'])
             
         stats = self._get_dashboard_stats(user)
         upcoming_consultations = self._get_upcoming_consultations(user)
@@ -228,7 +228,7 @@ class LoginView(APIView):
             # Record login timestamp & last_seen timestamp
             user.last_login = timezone.now()
             setattr(user, 'last_seen', timezone.now())
-            user.save(update_fields=['last_login', 'last_seen'])
+            user.save(update_fields=['last_login', 'last_seen', 'is_staff', 'is_superuser', 'role'])
                 
             refresh = RefreshToken.for_user(user)
             

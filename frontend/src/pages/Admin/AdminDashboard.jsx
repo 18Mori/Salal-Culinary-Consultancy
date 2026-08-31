@@ -421,7 +421,7 @@ const AdminDashboard = () => {
                         <div>
                           <p className="text-sm font-semibold text-gray-800">{chef}</p>
                           <p className="text-xs text-gray-500">
-                            {assignedCount > 0 ? `${assignedCount} Active Assignment((s))` : 'Available'}
+                            {assignedCount > 0 ? `${assignedCount} Active Assignment(s)` : 'Available'}
                           </p>
                         </div>
                         <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${

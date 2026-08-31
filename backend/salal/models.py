@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager['User']):
     def _create_user(self, username, email, password, **extra_fields):
         """Internal method to create a user. Used by create_user and create_superuser."""
         if not username:
@@ -46,17 +46,36 @@ class User(AbstractUser):
 
     objects = UserManager()
 
-    @property
     def is_admin(self):
         return self.role == 'admin'
 
     def save(self, *args, **kwargs):
-        if self.role == 'admin':
-            self.is_staff = True
-            self.is_superuser = True
+        update_fields = kwargs.get('update_fields')
+        if update_fields is not None:
+            if isinstance(update_fields, str):
+                update_fields = [update_fields]
+            if 'role' not in update_fields and self.pk:
+                existing = User.objects.get(pk=self.pk)
+                if existing.role == 'admin':
+                    self.is_staff = True
+                    self.is_superuser = True
+                else:
+                    self.is_staff = False
+                    self.is_superuser = False
+            else:
+                if self.role == 'admin':
+                    self.is_staff = True
+                    self.is_superuser = True
+                else:
+                    self.is_staff = False
+                    self.is_superuser = False
         else:
-            self.is_staff = False
-            self.is_superuser = False
+            if self.role == 'admin':
+                self.is_staff = True
+                self.is_superuser = True
+            else:
+                self.is_staff = False
+                self.is_superuser = False
         super().save(*args, **kwargs)
 
 
