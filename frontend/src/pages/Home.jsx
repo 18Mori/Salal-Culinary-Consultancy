@@ -22,7 +22,7 @@ function Home() {
             <div className="lg:col-span-7 space-y-8">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-amber-400 text-xs font-semibold tracking-wider uppercase">
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                Michelin-Star Consultancy
+                Michelin Star Consultancy
               </div>
 
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-light tracking-tight text-white leading-[1.1]">
@@ -75,7 +75,7 @@ function Home() {
                 
                 <div className="absolute bottom-6 left-6 right-6 p-6 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-800/80">
                   <p className="text-xs uppercase tracking-widest text-amber-400 font-semibold mb-1">Standard of Excellence</p>
-                  <p className="text-sm text-slate-300">Precision workflow and bespoke menu development tailored for world-class venues.</p>
+                  <p className="text-sm text-slate-300">Precision workflow and bespoke menu development tailored for world class venues.</p>
                 </div>
               </div>
             </div>
@@ -97,7 +97,7 @@ function Home() {
                 Crafting Culinary <span className="font-serif italic text-slate-300">Excellence</span>
               </h2>
               <p className="text-slate-400 text-lg leading-relaxed font-light">
-                At Salal Culinary Consultancy, we believe exceptional guest experiences rest on engineered kitchen precision. We marry time-honored techniques with contemporary operational design.
+                At Salal Culinary Consultancy, we believe exceptional guest experiences rest on engineered kitchen precision. We marry time honored techniques with contemporary operational design.
               </p>
 
               <blockquote className="mt-8 p-6 rounded-2xl bg-slate-950 border border-slate-800 relative">
@@ -115,7 +115,7 @@ function Home() {
                 </div>
                 <h3 className="text-xl font-medium text-white">Modern Culinary Science</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">
-                  Our team brings multi-decade Michelin-star experience directly to your kitchen, streamlining operations while preserving culinary integrity.
+                  Our team brings multi decade Michelin star experience directly to your kitchen, streamlining operations while preserving culinary integrity.
                 </p>
               </div>
             </div>

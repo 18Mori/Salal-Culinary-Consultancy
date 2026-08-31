@@ -243,7 +243,7 @@ class LoginView(APIView):
                     'email': user.email, 
                     'is_staff': user.is_staff,
                     'is_superuser': user.is_superuser,
-                    'role': user.role,
+                    'role': getattr(user, 'role', None),
                 }
             }, status=status.HTTP_200_OK)
         except Exception as e:
@@ -278,7 +278,7 @@ class RegisterView(APIView):
                         'username': user.username,
                         'is_staff': user.is_staff,
                         'is_superuser': user.is_superuser,
-                        'role': user.role,
+                        'role': getattr(user, 'role', None),
                     }
                 }, status=status.HTTP_201_CREATED)
                 
