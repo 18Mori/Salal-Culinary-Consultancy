@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import DNavigation from "../DNavigation";
 import Loader from "../../../../components/Loader";
+import MobileDrawer from "../../../../components/MobileDrawer";
 
 function Bill() {
   const [logout, setLogout] = useState(false);
@@ -11,6 +12,8 @@ function Bill() {
     const saved = localStorage.getItem('sidebarCollapsed');
     return saved ? JSON.parse(saved) : false;
   });
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (logout) {
@@ -47,7 +50,9 @@ function Bill() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      <div className="hidden md:block">
+        <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      </div>
       <main 
         className="p-6 transition-all duration-300 ease-out"
         style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
@@ -71,6 +76,30 @@ function BillingContent({ loading }) {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
+      <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
+        <div className="h-14 flex items-center justify-between">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all lg:hidden"
+            aria-label="Open mobile menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
@@ -155,7 +184,7 @@ function BillingContent({ loading }) {
           </div>
         )}
       </div>
-
+      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)} userRole={userData?.role || 'client'}/>}
     </div>
   );
 }

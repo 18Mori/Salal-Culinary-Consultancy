@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../../constants";
 import DNavigation from "./components/DNavigation";
+import MobileDrawer from "../../components/MobileDrawer";
 import Loader from "../../components/Loader";
 import DStats from "./components/DStats";
 import BookingList from "./components/page/BookingList";
@@ -48,6 +49,8 @@ function client_index() {
     return saved ? JSON.parse(saved) : false;
   });
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   useEffect(() => {
     if (logout) {
       localStorage.removeItem('access');
@@ -90,13 +93,42 @@ function client_index() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
+        <div className="h-14 flex items-center justify-between">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all lg:hidden"
+            aria-label="Open mobile menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="hidden md:block">
+        <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      </div>
+
       <main 
         className="p-6 transition-all duration-300 ease-out"
         style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
       >
         <DashboardContent loading={loading} userData={userData} />
       </main>
+      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)} userRole={userData?.role || 'client'}/>}
     </div>
   );
 }
