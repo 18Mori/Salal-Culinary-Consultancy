@@ -13,8 +13,6 @@ const HomeNav = () => {
 
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);
-    // Check for explicit admin indicators saved during login (e.g. localStorage.setItem('is_admin', 'true'))
-    // Alternatively, pull from your user profile object or JWT payload
     const adminFlag = localStorage.getItem("is_admin") === "true" || localStorage.getItem("user_role") === "admin";
 
     setAuthState({
@@ -38,7 +36,7 @@ const HomeNav = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          
+
           {/* Brand Logo */}
           <Link 
             to="/" 
@@ -96,7 +94,7 @@ const HomeNav = () => {
           </button>
 
           {/* Conditional Action Logic */}
-          <div className="flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-4">
             {!authState.isAuthenticated && (
               <Link
                 to="/login"

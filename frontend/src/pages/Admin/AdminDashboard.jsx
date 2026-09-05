@@ -334,7 +334,7 @@ const AdminDashboard = () => {
   if (error) return <div className="min-h-screen bg-background flex items-center justify-center p-6 text-terracotta text-xl">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-auto">
       <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
         <div className="h-14 flex items-center justify-between">
           <button
@@ -360,7 +360,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="hidden md:block">
+      <div className="hidden lg:flex">
         <AdminNavigation onToggleCollapse={setIsCollapsed} />
       </div>
 
@@ -388,8 +388,9 @@ const AdminDashboard = () => {
       )}
 
       <main 
-        className="p-6 transition-all duration-300 ease-out"
-        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+        className={`p-6 transition-all duration-300 ease-out ${
+          isCollapsed ? 'w-full ml-0' : 'w-full lg:w-[calc(100%-60px)] ml-0 lg:ml-64'
+        }`}
       >
         <div className="container mx-auto space-y-8">
 
@@ -478,12 +479,12 @@ const AdminDashboard = () => {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
-                    <th className="px-6 py-4">Client & Contact</th>
-                    <th className="px-6 py-4">Request / Requirements</th>
-                    <th className="px-6 py-4">Service & Type</th>
-                    <th className="px-6 py-4">Assigned Chef</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4 text-right">Coordinate</th>
+                    <th className="px-6 py-4 truncate">Client & Contact</th>
+                    <th className="px-6 py-4 truncate">Request / Requirements</th>
+                    <th className="px-6 py-4 truncate">Service & Type</th>
+                    <th className="px-6 py-4 truncate">Assigned Chef</th>
+                    <th className="px-6 py-4 truncate">Status</th>
+                    <th className="px-6 py-4 text-right truncate">Coordinate</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 text-sm">
@@ -495,8 +496,8 @@ const AdminDashboard = () => {
                           <div className="text-xs text-gray-500">{booking.client_email || 'No email'}</div>
                         </td>
                         <td className="px-6 py-4 max-w-xs">
-                          <div className="font-medium text-gray-900">{booking.booking_title || 'Consultation Request'}</div>
-                          <div className="text-xs text-gray-500 mt-1 italic">{booking.notes || 'No specific notes provided.'}</div>
+                          <div className="font-medium text-gray-900 truncate">{booking.booking_title || 'Consultation Request'}</div>
+                          <div className="text-xs text-gray-500 truncate mt-1 italic">{booking.notes || 'No specific notes provided.'}</div>
                           {booking.date && (
                             <div className="text-xs text-brass font-medium mt-1">
                               {new Date(booking.date).toLocaleDateString()} {booking.time ? `at ${booking.time}` : ''}
@@ -504,7 +505,7 @@ const AdminDashboard = () => {
                           )}
                         </td>
                         <td className="px-6 py-4 text-gray-600">
-                          <div>{booking.service_type || 'General Consultation'}</div>
+                          <div className="truncate">{booking.service_type || 'General Consultation'}</div>
                           {booking.session_type && (
                             <span className="inline-block mt-1 px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-medium">
                               {booking.session_type}
@@ -596,7 +597,7 @@ const AdminDashboard = () => {
                             ? `${client.first_name || ''} ${client.last_name || ''}`.trim()
                             : '—'}
                         </td>
-                        <td className="px-6 py-4 text-gray-600">{client.email || 'N/A'}</td>
+                        <td className="px-6 py-4 text-gray-600 truncate">{client.email || 'N/A'}</td>
                         <td className="px-6 py-4">
                           <UserStatusBadge 
                             activeStatus={client.active_status} 
@@ -604,10 +605,10 @@ const AdminDashboard = () => {
                             lastSeen={client.last_seen}
                           />
                         </td>
-                        <td className="px-6 py-4 text-gray-500">
+                        <td className="px-6 py-4 text-gray-500 truncate">
                           {client.date_joined ? new Date(client.date_joined).toLocaleDateString() : 'N/A'}
                         </td>
-                        <td className="px-6 py-4 text-gray-500">
+                        <td className="px-6 py-4 text-gray-500 truncate">
                           {client.last_seen 
                             ? new Date(client.last_seen).toLocaleString() 
                             : client.last_login 

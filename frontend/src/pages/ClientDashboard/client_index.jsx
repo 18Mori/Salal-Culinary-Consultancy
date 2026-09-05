@@ -92,7 +92,7 @@ function client_index() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen bg-background overflow-auto">
       <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
         <div className="h-14 flex items-center justify-between">
           <button
@@ -123,8 +123,9 @@ function client_index() {
       </div>
 
       <main 
-        className="p-6 transition-all duration-300 ease-out"
-        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+        className={`p-6 transition-all duration-300 ease-out ${
+          isCollapsed ? 'w-full ml-0 md:ml-16' : 'w-full lg:w-[calc(100%-60px)] ml-0 lg:ml-64'
+        }`}
       >
         <DashboardContent loading={loading} userData={userData} />
       </main>
@@ -145,10 +146,10 @@ function DashboardContent({ loading, userData }) {
       {/* Header Banner */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-slate-900 truncate">
             Welcome Back{userData?.first_name ? `, ${userData.first_name}` : ''}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">Here is an overview of your active consultations and account stats.</p>
+          <p className="text-sm text-slate-500 mt-1 truncate">Here is an overview of your active consultations and account stats.</p>
         </div>
         <button 
           onClick={() => setActiveModal('booking')}
@@ -173,14 +174,14 @@ function DashboardContent({ loading, userData }) {
       {/* Support & Resources Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="w-10 h-10 bg-amber-50 border border-amber-200 text-amber-600 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">Need Help?</h3>
-            <p className="text-sm text-slate-500 mb-4">Have questions about your scheduled consultations or billing?</p>
+<div>
+              <div className="w-10 h-10 bg-amber-50 border border-amber-200 text-amber-600 rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-bold text-slate-900 truncate mb-1">Need Help?</h3>
+              <p className="text-sm text-slate-500 truncate mb-4">Have questions about your scheduled consultations or billing?</p>
           </div>
           <button 
             onClick={() => setActiveModal('support')}
@@ -200,8 +201,8 @@ function DashboardContent({ loading, userData }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">Resources</h3>
-            <p className="text-sm text-slate-500 mb-4">Access consultation guides, platform guidelines, and FAQs.</p>
+            <h3 className="text-base font-bold text-slate-900 truncate mb-1">Resources</h3>
+            <p className="text-sm text-slate-500 truncate mb-4">Access consultation guides, platform guidelines, and FAQs.</p>
           </div>
           <button 
             onClick={() => setActiveModal('resources')}

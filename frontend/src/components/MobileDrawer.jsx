@@ -6,7 +6,9 @@ const MobileDrawer = ({ isOpen, onToggle, userRole }) => {
 
   const isActive = (path) => location.pathname === path;
 
-  const routes = userRole === 'admin'
+  const isAdmin = userRole === true || userRole === 'admin';
+
+  const routes = isAdmin
     ? [
         { path: '/admin-dashboard', label: 'Admin Dashboard' },
         { path: '/logout', label: 'Logout' }
@@ -17,25 +19,26 @@ const MobileDrawer = ({ isOpen, onToggle, userRole }) => {
         { path: '/bill', label: 'Bills' },
         { path: '/logout', label: 'Logout' }
       ];
-  const navigationItems = [
-      [
-        {path: '/Home', label:'Home'},
-        {path: '/About', label:'About'},
-        {path: '/Services', label:'Services'},
-        {path: '/Portfolio', label:'Portfolio'},
-        {path: '/client_dashboard', label: 'Client Dashboard'}
-      ]
-    ];
+
+  const navigationItems = isAdmin
+    ? [
+      { path: '/', label: 'Home' },
+        { path: '/About', label: 'About' },
+        { path: '/Services', label: 'Services' },
+        { path: '/Portfolio', label: 'Portfolio' }
+    ]
+    : [];
 
   return (
     <div
-      className={`fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-xl transition-all duration-300 ${
+      className={`fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-xl transition-all duration-300 bg-black ${
         isOpen ? 'visible' : 'hidden'
       }`}
       onClick={onToggle}
     >
       <div
-        className="fixed top-0 right-0 inset-0 w-full max-w-md mx-auto flex flex-col items-center justify-center gap-8 p-6 transform transition-all duration-300 ${
+        className="fixed top-0 right-0 inset-0 w-full max-w-md mx-auto overflow-y-auto h-[calc(100vh-64px)] flex flex-col items-center justify-center gap-8 p-6 transform transition-all duration-300 bg-slate-950/90 backdrop-blur-xl ${
+
           isOpen ? 'translateX(0) scale(1)' : 'translateX(-100%) scale(0.96)'
         }"
       >
@@ -44,10 +47,12 @@ const MobileDrawer = ({ isOpen, onToggle, userRole }) => {
           className="absolute top-4 right-4 text-white text-2xl hover:text-amber-400 transition-colors"
           aria-label="Close menu"
         >
-          X
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
 
-        {routes.map((route) => (
+        {navigationItems.map((route) => (
           <Link
             key={route.path}
             to={route.path}
@@ -58,8 +63,8 @@ const MobileDrawer = ({ isOpen, onToggle, userRole }) => {
             {route.label}
           </Link>
         ))}
-        
-        {navigationItems[0].map((route) => (
+
+        {routes.map((route) => (
           <Link
             key={route.path}
             to={route.path}

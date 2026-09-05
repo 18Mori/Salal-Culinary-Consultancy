@@ -70,7 +70,7 @@ const DNavigation = ({ onToggleCollapse }) => {
   return (
     <nav className={`fixed left-0 top-0 h-screen z-50 flex flex-col bg-slate-950/90 backdrop-blur-xl border-r border-slate-800/80 shadow-2xl transition-all duration-300 ease-out font-sans ${
       isCollapsed ? 'w-16' : 'w-60'
-    }`}>
+}`}>
       {/* Header */}
       <div className="flex items-center justify-between pt-5 pb-5 border-b border-slate-800/80 px-3">
         {!isCollapsed ? (
