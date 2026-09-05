@@ -86,6 +86,7 @@ function Booking() {
       >
         <DashboardContent loading={loading} />
       </main>
+      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)}/>}
     </div>
     </>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
+import MobileDrawer from "./MobileDrawer";
 
 function Form({ route, method }) {
   const navigate = useNavigate();
@@ -215,6 +216,7 @@ function Form({ route, method }) {
           </button>
         </div>
       </div>
+      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)}/>}
       <div className="w-full max-w-md">
         <div className="bg-slate-900/60 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-800/80 p-8">
           

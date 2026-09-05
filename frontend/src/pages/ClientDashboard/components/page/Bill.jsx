@@ -50,32 +50,6 @@ function Bill() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <div className="hidden md:block">
-        <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
-      </div>
-      <main 
-        className="p-6 transition-all duration-300 ease-out"
-        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
-      >
-        <BillingContent loading={loading} userData={userData} />
-      </main>
-    </div>
-  );
-}
-
-function BillingContent({ loading }) {
-  // Sample invoices state for layout blueprint
-  const [invoices] = useState([
-    { id: "INV-2026-001", date: "Aug 12, 2026", service: "Food Safety Consultation", amount: "$150.00", status: "Paid" },
-    { id: "INV-2026-002", date: "Aug 20, 2026", service: "Menu Development Review", amount: "$220.00", status: "Pending" }
-  ]);
-
-  if (loading) {
-    return <Loader.Section />;
-  }
-
-  return (
-    <div className="max-w-7xl mx-auto space-y-8">
       <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
         <div className="h-14 flex items-center justify-between">
           <button
@@ -100,7 +74,33 @@ function BillingContent({ loading }) {
           </button>
         </div>
       </div>
-      
+      <div className="hidden md:block">
+        <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      </div>
+      <main 
+        className="p-6 transition-all duration-300 ease-out"
+        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+      >
+        <BillingContent loading={loading} userData={userData} />
+      </main>
+      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)}/>}
+    </div>
+  );
+}
+
+function BillingContent({ loading }) {
+  // Sample invoices state for layout blueprint
+  const [invoices] = useState([
+    { id: "INV-2026-001", date: "Aug 12, 2026", service: "Food Safety Consultation", amount: "$150.00", status: "Paid" },
+    { id: "INV-2026-002", date: "Aug 20, 2026", service: "Menu Development Review", amount: "$220.00", status: "Pending" }
+  ]);
+
+  if (loading) {
+    return <Loader.Section />;
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-8"> 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
@@ -184,7 +184,6 @@ function BillingContent({ loading }) {
           </div>
         )}
       </div>
-      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)} userRole={userData?.role || 'client'}/>}
     </div>
   );
 }
