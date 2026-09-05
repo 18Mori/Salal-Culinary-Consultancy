@@ -19,7 +19,7 @@ const HomeNav = () => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        isAdmin = decoded.role === 'admin';
+        isAdmin = decoded.role === 'admin' && decoded.is_superuser === true;
       } catch {
         isAdmin = false;
       }
