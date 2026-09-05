@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
+import MobileDrawer from "./MobileDrawer";
 
 function Form({ route, method }) {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ function Form({ route, method }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
   
   // Password Visibility Toggle State
   const [showPassword, setShowPassword] = useState(false);
@@ -200,6 +203,20 @@ function Form({ route, method }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 font-sans text-slate-100">
+      <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
+        <div className="h-14 flex items-center justify-between">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all lg:hidden"
+            aria-label="Open mobile menu"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)}/>}
       <div className="w-full max-w-md">
         <div className="bg-slate-900/60 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-800/80 p-8">
           

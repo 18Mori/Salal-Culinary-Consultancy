@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import DNavigation from "../DNavigation";
 import Loader from "../../../../components/Loader";
+import MobileDrawer from "../../../../components/MobileDrawer";
 
 function Bill() {
   const [logout, setLogout] = useState(false);
@@ -11,6 +12,8 @@ function Bill() {
     const saved = localStorage.getItem('sidebarCollapsed');
     return saved ? JSON.parse(saved) : false;
   });
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (logout) {
@@ -47,13 +50,41 @@ function Bill() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
+        <div className="h-14 flex items-center justify-between">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all lg:hidden"
+            aria-label="Open mobile menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="hidden md:block">
+        <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      </div>
       <main 
-        className="p-6 transition-all duration-300 ease-out"
-        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+        className={`p-6 transition-all duration-300 ease-out ${
+          isCollapsed ? 'md-4rem ml-0 md:ml-16' : 'w-full lg:w-[calc(100%-15rem)] ml-0 lg:ml-64'
+        }`}
       >
         <BillingContent loading={loading} userData={userData} />
       </main>
+      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)}/>}
     </div>
   );
 }
@@ -70,13 +101,15 @@ function BillingContent({ loading }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      
+    <div className="max-w-7xl mx-auto space-y-8"> 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Billing & Invoices</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage payment history, payment methods, and download transaction statements.</p>
+          <h1 className="text-3xl font-bold text-slate-600"> Still in developments. </h1>
+          {/* <p className="text-sm text-slate-500 mt-1">Manage payment history, payment methods, and download transaction statements.</p> */}
+        </div>
         </div>
         <button className="bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-sm">
           Payment Settings
@@ -155,7 +188,6 @@ function BillingContent({ loading }) {
           </div>
         )}
       </div>
-
     </div>
   );
 }

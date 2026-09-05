@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../../../../constants";
 import DNavigation from "../DNavigation";
 import BookingForm from "../../../../components/BookingForm";
-import BookingList from "./BookingList";
 import Loader from "../../../../components/Loader";
+import MobileDrawer from "../../../../components/MobileDrawer";
 
 
 function Booking() {
@@ -15,6 +15,8 @@ function Booking() {
     const saved = localStorage.getItem('sidebarCollapsed');
     return saved ? JSON.parse(saved) : false;
   });
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (logout) {
@@ -50,14 +52,42 @@ function Booking() {
 
   return (
     <>
-      <div className="min-h-screen bg-background">
-      <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      <div className="min-h-screen justify-items-center overflow-auto">
+        <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 md:hidden">
+        <div className="h-14 flex items-center justify-between">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all md:hidden"
+            aria-label="Open mobile menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="hidden md:block">
+        <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
+      </div>
       <main 
-        className="transition-all duration-300 ease-out"
-        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+        className={`p-6 transition-all duration-300 ease-out md:ml-0 ${
+          isCollapsed ? 'md:ml-4' : 'md:ml-16'
+        }`}
       >
         <DashboardContent loading={loading} />
       </main>
+      {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)}/>}
     </div>
     </>
   );
@@ -71,7 +101,6 @@ function DashboardContent({ loading }) {
     <div className="container">
       <BookingForm />
     </div>
-
   );
 }
 

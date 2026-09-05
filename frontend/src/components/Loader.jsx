@@ -33,7 +33,7 @@ export const CulinaryLoader = ({ message = "Crafting your culinary experience" }
       <CulinaryStyles />
       
       {/* Centered Glass Card Modal */}
-      <div className="flex flex-col items-center justify-center p-20 min-w-[300px] max-w-md bg-charcoal/60 border border-white/10 rounded-full shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl text-center">
+      <div className="flex flex-col items-center justify-center p-20 min-w-[300px] max-w-md bg-charcoal/60 border border-white/10 rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl text-center">
         
         {/* Animated Culinary Icon Container */}
         <div className="relative flex items-center justify-center w-28 h-28 mb-5">

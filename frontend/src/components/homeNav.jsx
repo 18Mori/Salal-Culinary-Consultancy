@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../constants';
+import MobileDrawer from './MobileDrawer';
 
 const HomeNav = () => {
   const [authState, setAuthState] = useState({
     isAuthenticated: false,
     isAdmin: false,
   });
-  
-  const location = useLocation();
+
+  const location = useLocation(); 
 
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);
-    // Check for explicit admin indicators saved during login (e.g. localStorage.setItem('is_admin', 'true'))
-    // Alternatively, pull from your user profile object or JWT payload
     const adminFlag = localStorage.getItem("is_admin") === "true" || localStorage.getItem("user_role") === "admin";
 
     setAuthState({
@@ -31,11 +30,13 @@ const HomeNav = () => {
 
   const isActivePath = (path) => location.pathname === path;
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          
+
           {/* Brand Logo */}
           <Link 
             to="/" 
@@ -71,8 +72,29 @@ const HomeNav = () => {
             ))}
           </div>
 
+          <button
+            onClick={() => setDrawerOpen(!drawerOpen)}
+            className="lg:hidden p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all"
+            aria-label="Open mobile menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+
           {/* Conditional Action Logic */}
-          <div className="flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-4">
             {!authState.isAuthenticated && (
               <Link
                 to="/login"
@@ -99,9 +121,11 @@ const HomeNav = () => {
                 Dashboard
               </Link>
             )}
+
           </div>
 
         </div>
+        {drawerOpen && <MobileDrawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(false)} userRole={authState.isAdmin}/>}
       </nav>
     </header>
   );
