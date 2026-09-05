@@ -9,7 +9,7 @@ const HomeNav = () => {
     isAdmin: false,
   });
 
-  const location = useLocation();
+  const location = useLocation(); 
 
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);

@@ -23,9 +23,9 @@ const MobileDrawer = ({ isOpen, onToggle, userRole }) => {
   const navigationItems = isAdmin
     ? [
       { path: '/', label: 'Home' },
-        { path: '/About', label: 'About' },
-        { path: '/Services', label: 'Services' },
-        { path: '/Portfolio', label: 'Portfolio' }
+        { path: '/about', label: 'About' },
+        { path: '/services', label: 'Services' },
+        { path: '/portfolio', label: 'Portfolio' }
     ]
     : [];
 

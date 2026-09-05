@@ -93,11 +93,11 @@ function client_index() {
 
   return (
     <div className="min-h-screen bg-background overflow-auto">
-      <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
+      <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 md:hidden">
         <div className="h-14 flex items-center justify-between">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all lg:hidden"
+            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all md:hidden"
             aria-label="Open mobile menu"
           >
             <svg
@@ -124,7 +124,7 @@ function client_index() {
 
       <main 
         className={`p-6 transition-all duration-300 ease-out ${
-          isCollapsed ? 'w-full ml-0 md:ml-16' : 'w-full lg:w-[calc(100%-60px)] ml-0 lg:ml-64'
+          isCollapsed ? 'md-4rem ml-0 md:ml-16' : 'w-full lg:w-[calc(100%-15rem)] ml-0 lg:ml-64'
         }`}
       >
         <DashboardContent loading={loading} userData={userData} />

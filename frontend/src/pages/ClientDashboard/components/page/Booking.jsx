@@ -52,12 +52,12 @@ function Booking() {
 
   return (
     <>
-      <div className="min-h-screen bg-background">
-        <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:hidden">
+      <div className="min-h-screen justify-items-center overflow-auto">
+        <div className="fixed top-0 left-0 right-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 md:hidden">
         <div className="h-14 flex items-center justify-between">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all lg:hidden"
+            className="p-2 rounded-lg text-slate-300 hover:text-amber-400 transition-all md:hidden"
             aria-label="Open mobile menu"
           >
             <svg
@@ -81,8 +81,9 @@ function Booking() {
         <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
       </div>
       <main 
-        className="transition-all duration-300 ease-out"
-        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+        className={`p-6 transition-all duration-300 ease-out md:ml-0 ${
+          isCollapsed ? 'md:ml-4' : 'md:ml-16'
+        }`}
       >
         <DashboardContent loading={loading} />
       </main>

@@ -389,7 +389,7 @@ const AdminDashboard = () => {
 
       <main 
         className={`p-6 transition-all duration-300 ease-out ${
-          isCollapsed ? 'w-full ml-0' : 'w-full lg:w-[calc(100%-60px)] ml-0 lg:ml-64'
+          isCollapsed ? 'w-full ml-0' : 'w-full lg:w-[calc(100%-15rem)] ml-0 lg:ml-64'
         }`}
       >
         <div className="container mx-auto space-y-8">

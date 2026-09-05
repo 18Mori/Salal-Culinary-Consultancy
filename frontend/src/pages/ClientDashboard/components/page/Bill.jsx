@@ -78,8 +78,9 @@ function Bill() {
         <DNavigation onToggleCollapse={setIsCollapsed} setLogout={setLogout} />
       </div>
       <main 
-        className="p-6 transition-all duration-300 ease-out"
-        style={{ marginLeft: isCollapsed ? '4rem' : '15rem' }}
+        className={`p-6 transition-all duration-300 ease-out ${
+          isCollapsed ? 'md-4rem ml-0 md:ml-16' : 'w-full lg:w-[calc(100%-15rem)] ml-0 lg:ml-64'
+        }`}
       >
         <BillingContent loading={loading} userData={userData} />
       </main>
@@ -103,9 +104,12 @@ function BillingContent({ loading }) {
     <div className="max-w-7xl mx-auto space-y-8"> 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Billing & Invoices</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage payment history, payment methods, and download transaction statements.</p>
+          <h1 className="text-3xl font-bold text-slate-600"> Still in developments. </h1>
+          {/* <p className="text-sm text-slate-500 mt-1">Manage payment history, payment methods, and download transaction statements.</p> */}
+        </div>
         </div>
         <button className="bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-sm">
           Payment Settings
