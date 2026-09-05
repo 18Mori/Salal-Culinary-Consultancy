@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import { ACCESS_TOKEN } from '../constants';
 import MobileDrawer from './MobileDrawer';
 
@@ -13,11 +14,20 @@ const HomeNav = () => {
 
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);
-    const adminFlag = localStorage.getItem("is_admin") === "true" || localStorage.getItem("user_role") === "admin";
+    
+    let isAdmin = false;
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        isAdmin = decoded.role === 'admin';
+      } catch {
+        isAdmin = false;
+      }
+    }
 
     setAuthState({
       isAuthenticated: !!token,
-      isAdmin: adminFlag,
+      isAdmin,
     });
   }, []);
 
