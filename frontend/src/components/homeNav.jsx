@@ -15,18 +15,26 @@ const HomeNav = () => {
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);
     
+    let isAuthenticated = false;
     let isAdmin = false;
+
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        isAdmin = decoded.role === 'admin' && decoded.is_superuser === true;
+        const now = Date.now() / 1000;
+        if (decoded.exp && decoded.exp > now) {
+          isAuthenticated = true;
+          isAdmin = decoded.role === 'admin' && decoded.is_superuser === true;
+        } else {
+          localStorage.removeItem(ACCESS_TOKEN);
+        }
       } catch {
-        isAdmin = false;
+        localStorage.removeItem(ACCESS_TOKEN);
       }
     }
 
     setAuthState({
-      isAuthenticated: !!token,
+      isAuthenticated,
       isAdmin,
     });
   }, []);
