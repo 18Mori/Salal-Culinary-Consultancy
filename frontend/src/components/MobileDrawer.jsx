@@ -20,7 +20,7 @@ const MobileDrawer = ({ isOpen, onToggle, userRole }) => {
         { path: '/logout', label: 'Logout' }
       ];
 
-  const navigationItems = isAdmin
+  const navigationItems = !isAdmin
     ? [
       { path: '/', label: 'Home' },
         { path: '/about', label: 'About' },
