@@ -231,6 +231,16 @@ class LoginView(APIView):
             user.save(update_fields=['last_login', 'last_seen'])
                 
             refresh = RefreshToken.for_user(user)
+            # Add custom claims to both refresh and access tokens
+            refresh['role'] = getattr(user, 'role', 'client')
+            refresh['is_staff'] = user.is_staff
+            refresh['is_superuser'] = user.is_superuser
+            refresh['username'] = user.username
+            # Also add to the access token explicitly
+            refresh.access_token['role'] = getattr(user, 'role', 'client')
+            refresh.access_token['is_staff'] = user.is_staff
+            refresh.access_token['is_superuser'] = user.is_superuser
+            refresh.access_token['username'] = user.username
             
             return Response({
                 'access': str(refresh.access_token),
@@ -267,6 +277,17 @@ class RegisterView(APIView):
                 user.save(update_fields=['last_seen'])
 
                 refresh = RefreshToken.for_user(user)
+                # Add custom claims to both refresh and access tokens
+                refresh['role'] = getattr(user, 'role', 'client')
+                refresh['is_staff'] = user.is_staff
+                refresh['is_superuser'] = user.is_superuser
+                refresh['username'] = user.username
+                # Also add to the access token explicitly
+                refresh.access_token['role'] = getattr(user, 'role', 'client')
+                refresh.access_token['is_staff'] = user.is_staff
+                refresh.access_token['is_superuser'] = user.is_superuser
+                refresh.access_token['username'] = user.username
+                
                 return Response({
                     'access': str(refresh.access_token),
                     'refresh': str(refresh),

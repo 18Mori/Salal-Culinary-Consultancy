@@ -171,10 +171,8 @@ function Form({ route, method }) {
       localStorage.setItem(ACCESS_TOKEN, data.access);
       localStorage.setItem(REFRESH_TOKEN, data.refresh);
 
-      // --- UNIFIED ROLE DETECTION & ROUTING ---
-      // Backend now guarantees role === 'admin' <=> is_staff === true
       const userObj = data.user || data;
-      const isAdmin = userObj.role === 'admin' && userObj.is_staff === true;
+      const isAdmin = userObj.role === 'admin' && userObj.is_superuser === true;
 
       if (isAdmin) {
         navigate('/admin-dashboard');
