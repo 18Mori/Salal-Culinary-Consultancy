@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import ClientDashboard from "./pages/ClientDashboard/client_index"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
-import Booking from "./pages/ClientDashboard/components/page/Booking"
+
 import Bill from "./pages/ClientDashboard/components/page/Bill"
 import Loader from "./components/Loader";
 import { Suspense, lazy } from "react";
@@ -60,16 +60,7 @@ function App() {
           }
         />
         <Route path="/client_index" element={<Navigate to="/client_dashboard" replace />} />
-        <Route
-          path="/booking"
-          element={
-            <MainLayout>
-              <ProtectedRoute>
-                <Booking />
-              </ProtectedRoute>
-            </MainLayout>
-          }
-        />
+
         <Route
           path="/bill"
           element={

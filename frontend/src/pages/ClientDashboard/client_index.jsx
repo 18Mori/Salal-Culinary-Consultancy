@@ -5,6 +5,7 @@ import MobileDrawer from "../../components/MobileDrawer";
 import Loader from "../../components/Loader";
 import DStats from "./components/DStats";
 import BookingList from "./components/page/BookingList";
+import BookingForm from "../../components/BookingForm";
 
 function useHeartbeat() {
   useEffect(() => {
@@ -136,13 +137,20 @@ function client_index() {
 
 function DashboardContent({ loading, userData }) {
   const [activeModal, setActiveModal] = useState(null);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   if (loading) {
     return <Loader.Section />;
   }
 
+  const handleBookingSuccess = () => {
+    setIsBookingOpen(false);
+    setRefreshKey(prev => prev + 1);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8 relative">
       {/* Header Banner */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -152,8 +160,8 @@ function DashboardContent({ loading, userData }) {
           <p className="text-sm text-slate-500 mt-1 truncate">Here is an overview of your active consultations and account stats.</p>
         </div>
         <button 
-          onClick={() => setActiveModal('booking')}
-          className="bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+          onClick={() => setIsBookingOpen(true)}
+          className="bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-amber-500/20 active:scale-[0.98] flex items-center justify-center gap-2 shrink-0"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -164,24 +172,24 @@ function DashboardContent({ loading, userData }) {
 
       {/* Main Content Sections */}
       <div className="space-y-6">
-        <DStats />
+        <DStats key={refreshKey} />
         
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-          <BookingList />
+          <BookingList refreshKey={refreshKey} onOpenBooking={() => setIsBookingOpen(true)} />
         </div>
       </div>
 
       {/* Support & Resources Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-<div>
-              <div className="w-10 h-10 bg-amber-50 border border-amber-200 text-amber-600 rounded-xl flex items-center justify-center mb-4">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-              <h3 className="text-base font-bold text-slate-900 truncate mb-1">Need Help?</h3>
-              <p className="text-sm text-slate-500 truncate mb-4">Have questions about your scheduled consultations or billing?</p>
+          <div>
+            <div className="w-10 h-10 bg-amber-50 border border-amber-200 text-amber-600 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <h3 className="text-base font-bold text-slate-900 truncate mb-1">Need Help?</h3>
+            <p className="text-sm text-slate-500 truncate mb-4">Have questions about your scheduled consultations or billing?</p>
           </div>
           <button 
             onClick={() => setActiveModal('support')}
@@ -216,7 +224,70 @@ function DashboardContent({ loading, userData }) {
         </div>
       </div>
 
-      {/* Interactive Modals */}
+      {/* Slide-over Booking Window (Right to Left) */}
+      <div 
+        className={`fixed inset-0 z-50 overflow-hidden transition-all duration-300 ${
+          isBookingOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        aria-labelledby="slide-over-title" 
+        role="dialog" 
+        aria-modal="true"
+      >
+        {/* Backdrop overlay */}
+        <div 
+          onClick={() => setIsBookingOpen(false)}
+          className={`fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+            isBookingOpen ? 'opacity-100' : 'opacity-0'
+          }`} 
+        />
+
+        <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+          <div 
+            className={`w-screen max-w-lg bg-white shadow-2xl flex flex-col justify-between border-l border-slate-200 transform transition-transform duration-300 ease-in-out ${
+              isBookingOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
+          >
+            {/* Drawer Header */}
+            <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 id="slide-over-title" className="text-base font-bold tracking-tight text-white">
+                    Schedule Consultation
+                  </h2>
+                  <p className="text-xs text-slate-400">
+                    Book culinary guidance & advisory session
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBookingOpen(false)}
+                className="rounded-xl p-2 text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all focus:outline-none"
+              >
+                <span className="sr-only">Close panel</span>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Drawer Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <BookingForm 
+                onBookingSuccess={handleBookingSuccess} 
+                onClose={() => setIsBookingOpen(false)} 
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Support & Resource Modals */}
       {activeModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-lg p-6 relative">
@@ -228,17 +299,6 @@ function DashboardContent({ loading, userData }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-
-            {activeModal === 'booking' && (
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Create New Booking</h3>
-                <p className="text-sm text-slate-500 mb-4">Navigate to booking form or select an instant session parameter.</p>
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button onClick={() => setActiveModal(null)} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-xl">Cancel</button>
-                  <a href="/booking" className="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold">Go to Form</a>
-                </div>
-              </div>
-            )}
 
             {activeModal === 'support' && (
               <div>

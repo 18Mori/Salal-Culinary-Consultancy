@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../constants';
 
-const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
+const BookingForm = ({ selectedTimeSlot, onBookingSuccess, onClose }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
@@ -97,7 +97,6 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
 
       if (res.ok && res.status === 201) {
         onBookingSuccess?.(data);
-        navigate('/client_dashboard');
       } else {
         if (res.status === 401) {
           localStorage.removeItem(ACCESS_TOKEN);
@@ -122,25 +121,9 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
   const isFormValid = formData.title && formData.serviceType && formData.date && formData.time && formData.duration;
 
   return (
-    /* Outer Container: Clean Pure White Background */
-    <div className="min-h-screen w-full bg-white flex items-center justify-center p-4 sm:p-8 font-sans text-slate-900">
-      
-      {/* Form Card Container: White Card with Soft Border & Delicate Shadow */}
-      <div className="w-full max-w-xl bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-100 p-6 sm:p-10">
-        
-        {/* Morning Header */}
-        <div className="relative mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center gap-4 pb-6 border-b border-slate-100">
-          <div className="w-14 h-14 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm shrink-0">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Schedule Consultation</h2>
-            <p className="text-xs sm:text-sm text-slate-500 font-normal mt-0.5">Select your parameters and reserve your morning or afternoon session.</p>
-          </div>
-        </div>
-
+    <div className="w-full bg-white text-slate-900 font-sans">
+      {/* Form Card Container */}
+      <div className="w-full">
         {errors.general && (
           <div className="mb-6 p-3.5 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-xs text-center font-medium">
             {errors.general}
@@ -308,12 +291,21 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess }) => {
             />
           </div>
 
-          {/* Submit Button */}
-          <div className="pt-2">
+          {/* Buttons */}
+          <div className="pt-2 flex items-center gap-3">
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-3.5 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-2xl font-semibold text-sm transition-all"
+              >
+                Cancel
+              </button>
+            )}
             <button
               type="submit"
               disabled={!isFormValid || isSubmitting}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3.5 px-6 rounded-2xl font-semibold tracking-wide transition-all shadow-lg shadow-amber-500/25 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3.5 px-6 rounded-2xl font-semibold tracking-wide transition-all shadow-lg shadow-amber-500/25 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <span>Confirming Booking...</span>

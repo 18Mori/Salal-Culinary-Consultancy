@@ -1,7 +1,13 @@
 import React from "react";
 import HomeNav from "../components/homeNav";
+import { ACCESS_TOKEN } from "../constants";
 
 function Services() {
+  const isAuthenticated = !!localStorage.getItem(ACCESS_TOKEN);
+
+  const handleBookingRedirect = () => {
+    window.location.href = isAuthenticated ? '/client_dashboard' : '/login';
+  };
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-500 selection:text-slate-950">
       <HomeNav />
@@ -65,7 +71,10 @@ function Services() {
                   </div>
                 </div>
               </div>
-              <button className="mt-8 w-full py-3.5 bg-amber-400 text-slate-950 font-semibold rounded-xl hover:bg-amber-300 transition-colors">
+              <button 
+                onClick={handleBookingRedirect}
+                className="mt-8 w-full py-3.5 bg-amber-400 text-slate-950 font-semibold rounded-xl hover:bg-amber-300 transition-colors"
+              >
                 Start Project
               </button>
             </div>
@@ -83,7 +92,10 @@ function Services() {
                   <p className="text-sm text-slate-300 font-light">Market positioning, culinary story development, and competitive analysis.</p>
                 </div>
               </div>
-              <button className="mt-8 w-full py-3.5 border border-slate-700 text-slate-200 font-medium rounded-xl hover:bg-slate-800 transition-colors">
+              <button 
+                onClick={handleBookingRedirect}
+                className="mt-8 w-full py-3.5 border border-slate-700 text-slate-200 font-medium rounded-xl hover:bg-slate-800 transition-colors"
+              >
                 Book Strategy Session
               </button>
             </div>
@@ -103,7 +115,7 @@ function Services() {
           </p>
           <div className="pt-4">
             <button
-              onClick={() => window.location.href = '/booking'}
+              onClick={handleBookingRedirect}
               className="px-8 py-4 bg-amber-400 text-slate-950 rounded-xl font-semibold hover:bg-amber-300 transition-all shadow-lg shadow-amber-400/10"
             >
               Schedule Consultation

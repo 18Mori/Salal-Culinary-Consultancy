@@ -37,7 +37,7 @@ function Home() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <button
-                  onClick={() => (window.location.href = "/booking")}
+                  onClick={() => (window.location.href = isAuthenticated ? "/client_dashboard" : "/login")}
                   className="px-8 py-4 rounded-xl bg-amber-400 text-slate-950 font-semibold hover:bg-amber-300 transition-all duration-300 shadow-lg shadow-amber-400/20 active:scale-[0.98]"
                 >
                   Book a Consultation

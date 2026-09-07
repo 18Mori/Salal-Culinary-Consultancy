@@ -15,7 +15,6 @@ const MobileDrawer = ({ isOpen, onToggle, userRole }) => {
       ]
     : [
         { path: '/client_dashboard', label: 'Dashboard' },
-        { path: '/booking', label: 'Bookings' },
         { path: '/bill', label: 'Bills' },
         { path: '/logout', label: 'Logout' }
       ];
