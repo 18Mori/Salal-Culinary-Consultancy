@@ -103,7 +103,16 @@ const BookingForm = ({ selectedTimeSlot, onBookingSuccess, onClose }) => {
           navigate('/login');
         } else if (res.status === 400 || res.status === 422) {
           if (data && typeof data === 'object') {
-            setErrors(data);
+            if (data.non_field_errors) {
+              const errText = Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors;
+              if (errText.includes('unique set') || errText.includes('already exists')) {
+                setErrors({ general: 'You already have a consultation booked with this service at this date and time.' });
+              } else {
+                setErrors({ general: errText });
+              }
+            } else {
+              setErrors(data);
+            }
           } else {
             setErrors({ general: 'Invalid data. Please check your inputs.' });
           }

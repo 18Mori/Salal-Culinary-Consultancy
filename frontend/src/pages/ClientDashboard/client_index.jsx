@@ -278,10 +278,12 @@ function DashboardContent({ loading, userData }) {
 
             {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto p-6">
-              <BookingForm 
-                onBookingSuccess={handleBookingSuccess} 
-                onClose={() => setIsBookingOpen(false)} 
-              />
+              {isBookingOpen && (
+                <BookingForm 
+                  onBookingSuccess={handleBookingSuccess} 
+                  onClose={() => setIsBookingOpen(false)} 
+                />
+              )}
             </div>
           </div>
         </div>
