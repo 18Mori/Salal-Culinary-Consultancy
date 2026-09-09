@@ -12,6 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
 import logging
+import re
 from typing import cast
 
 User = get_user_model()
@@ -323,3 +324,61 @@ def user_detail(request):
         'is_superuser': request.user.is_superuser,
         'role': request.user.role,
     })
+
+
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').strip()
+        if not email:
+            return Response({'email': 'Email address is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(email__iexact=email)
+            return Response({
+                'message': 'Account verified. You may proceed to recreate your password.',
+                'email': user.email,
+                'username': user.username
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({
+                'email': 'No account was found with this email address.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').strip()
+        new_password = request.data.get('new_password', '')
+        confirm_password = request.data.get('confirm_password', '')
+
+        if not email:
+            return Response({'email': 'Email address is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not new_password:
+            return Response({'new_password': 'New password is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if new_password != confirm_password:
+            return Response({'confirm_password': 'Passwords do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate password strength
+        if len(new_password) < 8:
+            return Response({'new_password': 'Password must be at least 8 characters.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.search(r'[A-Za-z]', new_password):
+            return Response({'new_password': 'Password must contain at least one letter.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.search(r'\d', new_password):
+            return Response({'new_password': 'Password must contain at least one number.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.search(r'[^A-Za-z0-9]', new_password):
+            return Response({'new_password': 'Password must contain at least one special character (!@#$%).'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email__iexact=email)
+            user.set_password(new_password)
+            user.save()
+            return Response({
+                'message': 'Password recreated successfully! You can now log in with your new password.',
+                'username': user.username
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'email': 'No account was found with this email address.'}, status=status.HTTP_404_NOT_FOUND)

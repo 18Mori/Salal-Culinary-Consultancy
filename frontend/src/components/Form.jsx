@@ -5,12 +5,26 @@ import MobileDrawer from "./MobileDrawer";
 
 function Form({ route, method }) {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(() => localStorage.getItem('remember_me') === 'true' ? (localStorage.getItem('remembered_username') || '') : '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem('remember_me') === 'true');
+
+  // Forgot Password Modal State
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
+  const [forgotStep, setForgotStep] = useState('email');
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState('');
+  const [forgotSuccessMsg, setForgotSuccessMsg] = useState('');
+  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
+  const [showForgotConfirmPassword, setShowForgotConfirmPassword] = useState(false);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   
@@ -28,6 +42,68 @@ function Form({ route, method }) {
   const [errors, setErrors] = useState({});
 
   const name = method === 'login' ? 'Login' : 'Register';
+
+  const handleForgotEmailSubmit = async (e) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    setForgotError('');
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${apiUrl}/api/auth/forgot-password/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setForgotError(data.email || data.detail || 'Email verification failed.');
+        setForgotLoading(false);
+        return;
+      }
+      setForgotStep('reset');
+    } catch {
+      setForgotError('Network error. Please try again.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleForgotResetSubmit = async (e) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    setForgotError('');
+    if (forgotNewPassword !== forgotConfirmPassword) {
+      setForgotError('Passwords do not match.');
+      setForgotLoading(false);
+      return;
+    }
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${apiUrl}/api/auth/reset-password/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: forgotEmail,
+          new_password: forgotNewPassword,
+          confirm_password: forgotConfirmPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const errKey = Object.keys(data)[0];
+        const errMsg = Array.isArray(data[errKey]) ? data[errKey][0] : (data[errKey] || data.detail || 'Password reset failed.');
+        setForgotError(errMsg);
+        setForgotLoading(false);
+        return;
+      }
+      setForgotSuccessMsg(data.message || 'Password recreated successfully!');
+      setForgotStep('success');
+    } catch {
+      setForgotError('Network error. Please try again.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,6 +199,13 @@ function Form({ route, method }) {
 
       if (method === 'login') {
         payload = { username, password };
+        if (rememberMe) {
+          localStorage.setItem('remember_me', 'true');
+          localStorage.setItem('remembered_username', username);
+        } else {
+          localStorage.removeItem('remember_me');
+          localStorage.removeItem('remembered_username');
+        }
       } else {
         payload = {
           username,
@@ -471,6 +554,43 @@ function Form({ route, method }) {
                     <p className="mt-1 text-xs text-rose-400">{errors.password}</p>
                   )}
                 </div>
+
+                {/* Remember Me Radio & Forgot Password */}
+                <div className="flex items-center justify-between text-sm pt-1">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-300">
+                    <input
+                      type="radio"
+                      name="rememberMe"
+                      checked={rememberMe}
+                      onClick={() => {
+                        const newState = !rememberMe;
+                        setRememberMe(newState);
+                        if (!newState) {
+                          localStorage.removeItem('remember_me');
+                          localStorage.removeItem('remembered_username');
+                        }
+                      }}
+                      onChange={() => {}}
+                      className="w-4 h-4 rounded-full border-slate-700 bg-slate-950 text-amber-400 focus:ring-amber-400/30"
+                    />
+                    <span className="font-light text-xs uppercase tracking-wider">Remember Me</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForgotModalOpen(true);
+                      setForgotStep('email');
+                      setForgotEmail('');
+                      setForgotNewPassword('');
+                      setForgotConfirmPassword('');
+                      setForgotError('');
+                      setForgotSuccessMsg('');
+                    }}
+                    className="text-xs font-medium text-amber-400 hover:text-amber-300 transition-colors"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
               </>
             )}
 
@@ -525,6 +645,152 @@ function Form({ route, method }) {
 
         </div>
       </div>
+
+      {/* Forgot Password Modal Popup */}
+      {forgotModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative text-slate-100">
+            <button
+              onClick={() => setForgotModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-1"
+              aria-label="Close modal"
+            >
+              ✕
+            </button>
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-amber-400/10 border border-amber-400/20 rounded-xl flex items-center justify-center mx-auto mb-3 p-2.5">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4v-4l5.257-5.257A6 6 0 1121 9z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-light text-white tracking-wide">
+                {forgotStep === 'email' && 'Reset Password'}
+                {forgotStep === 'reset' && 'Recreate Password'}
+                {forgotStep === 'success' && 'Success'}
+              </h3>
+              <p className="text-xs text-slate-400 font-light mt-1">
+                {forgotStep === 'email' && 'Enter your registered email address to verify your account.'}
+                {forgotStep === 'reset' && 'Enter your new secure password below.'}
+                {forgotStep === 'success' && 'Your password has been successfully recreated.'}
+              </p>
+            </div>
+
+            {forgotError && (
+              <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-xs text-center">
+                {forgotError}
+              </div>
+            )}
+
+            {forgotSuccessMsg && forgotStep !== 'success' && (
+              <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-xs text-center">
+                {forgotSuccessMsg}
+              </div>
+            )}
+
+            {forgotStep === 'email' && (
+              <form onSubmit={handleForgotEmailSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="forgotEmail" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                    id="forgotEmail"
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    autoFocus
+                    className="w-full px-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-400/60 focus:ring-1 focus:ring-amber-400/30"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={forgotLoading}
+                  className="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 py-2.5 px-4 rounded-xl font-medium text-sm transition-all shadow-lg shadow-amber-400/10 disabled:opacity-50"
+                >
+                  {forgotLoading ? 'Verifying...' : 'Verify Email'}
+                </button>
+              </form>
+            )}
+
+            {forgotStep === 'reset' && (
+              <form onSubmit={handleForgotResetSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="forgotNewPassword" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="forgotNewPassword"
+                      type={showForgotNewPassword ? 'text' : 'password'}
+                      value={forgotNewPassword}
+                      onChange={(e) => setForgotNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      autoFocus
+                      className="w-full pl-4 pr-11 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-400/60 focus:ring-1 focus:ring-amber-400/30"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotNewPassword(!showForgotNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs"
+                    >
+                      {showForgotNewPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="forgotConfirmPassword" className="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="forgotConfirmPassword"
+                      type={showForgotConfirmPassword ? 'text' : 'password'}
+                      value={forgotConfirmPassword}
+                      onChange={(e) => setForgotConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      className="w-full pl-4 pr-11 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-400/60 focus:ring-1 focus:ring-amber-400/30"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotConfirmPassword(!showForgotConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs"
+                    >
+                      {showForgotConfirmPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={forgotLoading}
+                  className="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 py-2.5 px-4 rounded-xl font-medium text-sm transition-all shadow-lg shadow-amber-400/10 disabled:opacity-50"
+                >
+                  {forgotLoading ? 'Updating...' : 'Recreate Password'}
+                </button>
+              </form>
+            )}
+
+            {forgotStep === 'success' && (
+              <div className="text-center space-y-4">
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-xs">
+                  {forgotSuccessMsg}
+                </div>
+                <button
+                  onClick={() => setForgotModalOpen(false)}
+                  className="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 py-2.5 px-4 rounded-xl font-medium text-sm transition-all shadow-lg shadow-amber-400/10"
+                >
+                  Back to Login
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
